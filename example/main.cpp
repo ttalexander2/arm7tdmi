@@ -1,6 +1,6 @@
 #include <fmt/format.h>
 
-#include "decoder.h"
+#include <arm7tdmi/decoder.h>
 
 int main() {
 

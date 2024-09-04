@@ -2,7 +2,7 @@
 // Created by talexander on 9/3/2024.
 //
 
-#include "decoder.h"
+#include <arm7tdmi/decoder.h>
 
 namespace arm7tdmi {
 
