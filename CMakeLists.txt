@@ -48,5 +48,6 @@ add_subdirectory(example)
 
 if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         AND BUILD_TESTING)
+    include(CTest)
     add_subdirectory(tests)
 endif()

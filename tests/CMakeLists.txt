@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 option(ARM_VENDORED "Use vendored libraries" OFF)
 
 
-set(OUTPUT_DIR "arm7tdri-tests-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}")
+set(OUTPUT_DIR "arm7tdmi-tests-${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}-${CMAKE_BUILD_TYPE}")
 string(TOLOWER "${OUTPUT_DIR}" OUTPUT_DIR)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${OUTPUT_DIR}/")
@@ -22,9 +22,9 @@ list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
 
-
 add_executable(tests
-        test_decoder.cpp)
+        test_arm_instructions.cpp
+        test_thumb_instructions.cpp)
 
 target_link_libraries(tests PRIVATE arm7tdmi Catch2::Catch2WithMain fmt::fmt)
 
