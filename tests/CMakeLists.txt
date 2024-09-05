@@ -23,8 +23,8 @@ include(CTest)
 include(Catch)
 
 add_executable(tests
-        test_arm_instructions.cpp
-        test_thumb_instructions.cpp)
+        test_decode_arm_instructions.cpp
+        test_decode_thumb_instructions.cpp)
 
 target_link_libraries(tests PRIVATE arm7tdmi Catch2::Catch2WithMain fmt::fmt)
 
