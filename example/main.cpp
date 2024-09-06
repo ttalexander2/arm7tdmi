@@ -2,6 +2,8 @@
 
 #include <arm7tdmi/decoder.h>
 
+#include "arm7tdmi/cpu.h"
+
 int main() {
 
     u32 branch_and_exchange = 0x112fff14;
@@ -15,6 +17,15 @@ int main() {
     u32 multiply_long = 0x00FA8191;
     const auto multiply_long_instr = arm7tdmi::arm::decode(multiply_long);
     fmt::println("{:#034b} - {}", multiply_long, instruction_to_string(multiply_long_instr));
+
+    arm7tdmi::cpu cpu{};
+    cpu.cpsr = 32;
+    bool c = cpu.cpsr.set_c(true);
+    cpu.pc++;
+    fmt::println("{}, {}", static_cast<u32>(cpu.cpsr), c);
+
+    fmt::println("cpu size: {}", sizeof(arm7tdmi::cpu));
+
 
     return 0;
 }

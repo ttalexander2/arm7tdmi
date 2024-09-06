@@ -33,7 +33,8 @@ FetchContent_MakeAvailable(fmt)
 
 
 
-add_library(arm7tdmi STATIC)
+add_library(arm7tdmi STATIC
+        include/arm7tdmi/cpu.h)
 
 include_directories(include)
 
