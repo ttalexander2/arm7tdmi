@@ -19,12 +19,12 @@ int main() {
     fmt::println("{:#034b} - {}", multiply_long, instruction_to_string(multiply_long_instr));
 
     arm7tdmi::cpu cpu{};
-    cpu.cpsr = 32;
-    bool c = cpu.cpsr.set_c(true);
-    cpu.pc++;
-    fmt::println("{}, {}", static_cast<u32>(cpu.cpsr), c);
+    cpu.registers.cpsr = 32;
+    bool c = cpu.registers.cpsr.set_c(false);
+    cpu.registers.pc++;
+    fmt::println("{}, {}", static_cast<u32>(cpu.registers.cpsr), c);
 
-    fmt::println("cpu size: {}", sizeof(arm7tdmi::cpu));
+    fmt::println("cpu size: {}", sizeof(arm7tdmi::cpu) / sizeof(u32));
 
 
     return 0;

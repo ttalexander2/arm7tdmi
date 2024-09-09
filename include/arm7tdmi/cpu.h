@@ -22,64 +22,90 @@ namespace arm7tdmi {
             thumb
         };
 
-        union {
-            u32 registers[18] = {};
-            
-            struct {
-                u32 r0;
-                u32 r1;
-                u32 r2;
-                u32 r3;
-                u32 r4;
-                u32 r5;
-                u32 r6;
-                u32 r7;
-                u32 r8;
-                u32 r9;
-                u32 r10;
-                u32 r11;
-                u32 r12;
+        enum class condition_code : u8
+        {
+            equal = 0,
+            nequal = 1,
+            unsigned_higher_or_same = 2,
+            unsigned_lower = 3,
+            negative = 4,
+            positive_or_zero = 5,
+            overflow = 6,
+            no_overflow = 7,
+            unsigned_higher = 8,
+            unsigned_lower_or_same = 9,
+            greater_or_equal = 10,
+            less_than = 11,
+            greater_than = 12,
+            less_than_or_equal = 13,
+            always = 14,
+            never = 15
+        };
 
-                union {
-                    u32 r13;
-                    u32 sp;
-                };
-
-                union {
-                    u32 r14;
-                    u32 lp;
-                };
-
-                union {
-                    u32 r15;
-                    u32 pc;
-                };
+        // Storage for registers
+        struct
+        {
+            union { // Using a union here to have multiple aliases for accessing registers.
+                u32 data[18] = {};
 
                 struct {
-                    u32 data;
+                    u32 r0;
+                    u32 r1;
+                    u32 r2;
+                    u32 r3;
+                    u32 r4;
+                    u32 r5;
+                    u32 r6;
+                    u32 r7;
+                    u32 r8;
+                    u32 r9;
+                    u32 r10;
+                    u32 r11;
+                    u32 r12;
 
-                    [[nodiscard]] bool n() const { return bit_check(data, CPSR_N); }
-                    u32 set_n(const bool val) { return data = bit_set_to(data, CPSR_N, val);}
+                    union {
+                        u32 r13;
+                        u32 sp;
+                    };
 
-                    [[nodiscard]] bool c() const { return bit_check(data, CPSR_C); }
-                    u32 set_c(const bool val) { return data = bit_set_to(data, CPSR_C, val);}
+                    union {
+                        u32 r14;
+                        u32 lp;
+                    };
 
-                    [[nodiscard]] bool v() const { return bit_check(data, CPSR_V); }
-                    u32 set_v(const bool val) { return data = bit_set_to(data, CPSR_V, val);}
+                    union {
+                        u32 r15;
+                        u32 pc;
+                    };
 
-                    [[nodiscard]] bool z() const { return bit_check(data, CPSR_Z); }
-                    u32 set_z(const bool val) { return data = bit_set_to(data, CPSR_Z, val);}
+                    struct {
+                        u32 cpsr_register;
 
-                    // ReSharper disable once CppNonExplicitConversionOperator
-                    operator u32&() { return data;} // NOLINT(*-explicit-constructor)
+                        [[nodiscard]] bool n() const { return bit_check(cpsr_register, CPSR_N); }
+                        u32 set_n(const bool val) { return cpsr_register = bit_set_to(cpsr_register, CPSR_N, val);}
 
-                    u32 operator=(const u32 &val) { return data = val;} // NOLINT(*-unconventional-assign-operator)
+                        [[nodiscard]] bool c() const { return bit_check(cpsr_register, CPSR_C); }
+                        u32 set_c(const bool val) { return cpsr_register = bit_set_to(cpsr_register, CPSR_C, val);}
 
-                } cpsr;
+                        [[nodiscard]] bool v() const { return bit_check(cpsr_register, CPSR_V); }
+                        u32 set_v(const bool val) { return cpsr_register = bit_set_to(cpsr_register, CPSR_V, val);}
 
-                u32 spsr;
+                        [[nodiscard]] bool z() const { return bit_check(cpsr_register, CPSR_Z); }
+                        u32 set_z(const bool val) { return cpsr_register = bit_set_to(cpsr_register, CPSR_Z, val);}
+
+                        // ReSharper disable once CppNonExplicitConversionOperator
+                        operator u32&() { return cpsr_register;} // NOLINT(*-explicit-constructor)
+
+                        u32 operator=(const u32 &val) { return cpsr_register = val;} // NOLINT(*-unconventional-assign-operator)
+
+                    } cpsr;
+
+                    u32 spsr;
+                };
             };
-        };
+
+        } registers;
+
 
 
 
