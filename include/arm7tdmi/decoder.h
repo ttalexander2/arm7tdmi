@@ -13,7 +13,7 @@ namespace arm7tdmi {
         enum class instruction : u8 {
             branch_and_exchange,
             block_data_transfer,
-            branch_and_branch_with_link,
+            branch,
             software_interupt,
             undefined,
             single_data_transfer,

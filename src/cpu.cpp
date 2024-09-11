@@ -1,6 +1,7 @@
 //
 // Created by talexander on 9/9/2024.
 //
+#include <cassert>
 #include <arm7tdmi/cpu.h>
 
 namespace arm7tdmi {
@@ -10,7 +11,7 @@ namespace arm7tdmi {
         switch(instr) {
             case arm::instruction::branch_and_exchange: execute_arm_branch_and_exchange(opcode); break;
             case arm::instruction::block_data_transfer: execute_arm_block_data_transfer(opcode); break;
-            case arm::instruction::branch_and_branch_with_link: execute_arm_branch_and_branch_with_link(opcode); break;
+            case arm::instruction::branch: execute_arm_branch(opcode); break;
             case arm::instruction::software_interupt: execute_arm_software_interupt(opcode); break;
             case arm::instruction::undefined: execute_arm_undefined(opcode); break;
             case arm::instruction::single_data_transfer: execute_arm_single_data_transfer(opcode); break;
@@ -26,7 +27,7 @@ namespace arm7tdmi {
             case arm::instruction::unknown: execute_arm_unknown(opcode);
         }
     }
-        void cpu::execute(thumb::instruction instr, u16 opcode) {
+        void cpu::execute(const thumb::instruction instr, const u16 opcode) {
         switch(instr) {
             case thumb::instruction::software_interrupt: execute_thumb_software_interrupt(opcode); break;
             case thumb::instruction::unconditional_branch: execute_thumb_unconditional_branch(opcode); break;
@@ -53,109 +54,191 @@ namespace arm7tdmi {
         }
     }
 
-    void cpu::execute_arm_branch_and_exchange(const u32 opcode) {
+    void cpu::execute_arm_branch_and_exchange(const u32 instr) {
+
+        if (!check_condition(instr))
+            return;
+
+        // register number
+        const u32 rn = instr & 0xf;
+        assert(rn < 15);
+
+        const cpu_mode exchange_mode = (instr & 1) == 1 ? cpu_mode::thumb : cpu_mode::arm;
+
+        if (mode == cpu_mode::arm && exchange_mode == cpu_mode::thumb)
+        {
+            registers.pc = registers.data[rn | static_cast<u32>(1)] - 1; // set bit 0 to 1, use Rn - 1
+        }
+        else
+        {
+            registers.pc = registers.data[rn]; // Either in same mode, or switching to arm, use Rn
+        }
+
+        // if bit 0 of RN == 1 subsequent instructions are THUMB, else ARM
+        mode = exchange_mode;
     }
 
-    void cpu::execute_arm_block_data_transfer(const u32 opcode) {
+    void cpu::execute_arm_block_data_transfer(const u32 instr) {
+
     }
 
-    void cpu::execute_arm_branch_and_branch_with_link(const u32 opcode) {
+    void cpu::execute_arm_branch(const u32 instr) {
+
+        if (!check_condition(instr))
+            return;
+
+        const u32 opcode = (instr >> 23) & 1;
+
+        const u32 offset = instr & 0x00ffffff;
+
+        registers.pc = registers.pc + 8 + offset * 4;
+
+        if (opcode == 1) // branch with link - return address in REG_LR
+        {
+            registers.lr = registers.pc + 4;
+        }
     }
 
-    void cpu::execute_arm_software_interupt(const u32 opcode) {
+    void cpu::execute_arm_software_interupt(const u32 instr) {
     }
 
-    void cpu::execute_arm_undefined(const u32 opcode) {
+    void cpu::execute_arm_undefined(const u32 instr) {
     }
 
-    void cpu::execute_arm_single_data_transfer(const u32 opcode) {
+    void cpu::execute_arm_single_data_transfer(const u32 instr) {
     }
 
-    void cpu::execute_arm_single_data_swap(const u32 opcode) {
+    void cpu::execute_arm_single_data_swap(const u32 instr) {
     }
 
-    void cpu::execute_arm_multiply(const u32 opcode) {
+    void cpu::execute_arm_multiply(const u32 instr) {
     }
 
-    void cpu::execute_arm_multiply_long(const u32 opcode) {
+    void cpu::execute_arm_multiply_long(const u32 instr) {
     }
 
-    void cpu::execute_arm_halfword_data_transfer_register(const u32 opcode) {
+    void cpu::execute_arm_halfword_data_transfer_register(const u32 instr) {
     }
 
-    void cpu::execute_arm_halfword_data_transfer_immediate(const u32 opcode) {
+    void cpu::execute_arm_halfword_data_transfer_immediate(const u32 instr) {
     }
 
-    void cpu::execute_arm_psr_transfer_mrs(const u32 opcode) {
+    void cpu::execute_arm_psr_transfer_mrs(const u32 instr) {
     }
 
-    void cpu::execute_arm_psr_transfer_msr(const u32 opcode) {
+    void cpu::execute_arm_psr_transfer_msr(const u32 instr) {
     }
 
-    void cpu::execute_arm_data_processing(const u32 opcode) {
+    void cpu::execute_arm_data_processing(const u32 instr) {
     }
 
-    void cpu::execute_arm_unknown(const u32 opcode) {
+    void cpu::execute_arm_unknown(const u32 instr) {
     }
 
-    void cpu::execute_thumb_software_interrupt(u16 opcode) {
+    bool cpu::check_condition(const u32 instr) const {
+
+        u32 cond = (instr >> 28) & 0xf;
+
+        const u8 N = registers.cpsr.n();
+        const u8 Z = registers.cpsr.z();
+        const u8 C = registers.cpsr.c();
+        const u8 V = registers.cpsr.v();
+
+        switch(static_cast<condition_code>(cond))
+        {
+            case condition_code::equal:
+                return Z == 1;
+            case condition_code::nequal:
+                return Z == 0;
+            case condition_code::unsigned_higher_or_same:
+                return C == 1;
+            case condition_code::unsigned_lower:
+                return C == 0;
+            case condition_code::negative:
+                return N == 1;
+            case condition_code::positive_or_zero:
+                return N == 0;
+            case condition_code::overflow:
+                return V == 1;
+            case condition_code::unsigned_higher:
+                return C == 1 && Z == 0;
+            case condition_code::unsigned_lower_or_same:
+                return C == 0 || Z == 1;
+            case condition_code::greater_or_equal:
+                return N == V;
+            case condition_code::less_than:
+                return N != V;
+            case condition_code::greater_than:
+                return Z == 0 && N == V;
+            case condition_code::less_than_or_equal:
+                return Z == 1 || N != V;
+            case condition_code::always:
+                return true;
+            case condition_code::never:
+                return false;
+            default:
+                return true;
+        }
     }
 
-    void cpu::execute_thumb_unconditional_branch(u16 opcode) {
+    void cpu::execute_thumb_software_interrupt(u16 instr) {
     }
 
-    void cpu::execute_thumb_conditional_branch(u16 opcode) {
+    void cpu::execute_thumb_unconditional_branch(u16 instr) {
     }
 
-    void cpu::execute_thumb_multiple_load_store(u16 opcode) {
+    void cpu::execute_thumb_conditional_branch(u16 instr) {
     }
 
-    void cpu::execute_thumb_long_branch_with_link(u16 opcode) {
+    void cpu::execute_thumb_multiple_load_store(u16 instr) {
     }
 
-    void cpu::execute_thumb_add_offset_to_stack_pointer(u16 opcode) {
+    void cpu::execute_thumb_long_branch_with_link(u16 instr) {
     }
 
-    void cpu::execute_thumb_push_pop_registers(u16 opcode) {
+    void cpu::execute_thumb_add_offset_to_stack_pointer(u16 instr) {
     }
 
-    void cpu::execute_thumb_load_store_halfword(u16 opcode) {
+    void cpu::execute_thumb_push_pop_registers(u16 instr) {
     }
 
-    void cpu::execute_thumb_sp_relative_load_store(u16 opcode) {
+    void cpu::execute_thumb_load_store_halfword(u16 instr) {
     }
 
-    void cpu::execute_thumb_load_address(u16 opcode) {
+    void cpu::execute_thumb_sp_relative_load_store(u16 instr) {
     }
 
-    void cpu::execute_thumb_load_store_with_immediate_offset(u16 opcode) {
+    void cpu::execute_thumb_load_address(u16 instr) {
     }
 
-    void cpu::execute_thumb_load_store_with_register_offset(u16 opcode) {
+    void cpu::execute_thumb_load_store_with_immediate_offset(u16 instr) {
     }
 
-    void cpu::execute_thumb_load_store_sign_extended_byte_halfword(u16 opcode) {
+    void cpu::execute_thumb_load_store_with_register_offset(u16 instr) {
     }
 
-    void cpu::execute_thumb_pc_relative_load(u16 opcode) {
+    void cpu::execute_thumb_load_store_sign_extended_byte_halfword(u16 instr) {
     }
 
-    void cpu::execute_thumb_hi_register_operations_branch_exchange(u16 opcode) {
+    void cpu::execute_thumb_pc_relative_load(u16 instr) {
     }
 
-    void cpu::execute_thumb_alu_operations(u16 opcode) {
+    void cpu::execute_thumb_hi_register_operations_branch_exchange(u16 instr) {
     }
 
-    void cpu::execute_thumb_move_compare_add_subtract_immediate(u16 opcode) {
+    void cpu::execute_thumb_alu_operations(u16 instr) {
     }
 
-    void cpu::execute_thumb_add_subtract(u16 opcode) {
+    void cpu::execute_thumb_move_compare_add_subtract_immediate(u16 instr) {
     }
 
-    void cpu::execute_thumb_move_shifted_register(u16 opcode) {
+    void cpu::execute_thumb_add_subtract(u16 instr) {
     }
 
-    void cpu::execute_thumb_unknown(u16 opcode) {
+    void cpu::execute_thumb_move_shifted_register(u16 instr) {
+    }
+
+    void cpu::execute_thumb_unknown(u16 instr) {
     }
 
 

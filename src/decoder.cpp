@@ -21,7 +21,7 @@ namespace arm7tdmi {
                 return (opcode & mask) == format;
             }
 
-            bool is_branch_and_branch_with_link(const u32 opcode) {
+            bool is_branch(const u32 opcode) {
                 constexpr u32 branch_format = 0x0a000000;
                 constexpr u32 link_format = 0x0b000000;
                 constexpr u32 mask = 0x0f000000;
@@ -99,7 +99,7 @@ namespace arm7tdmi {
         instruction decode(const u32 opcode) {
             if (is_branch_and_exchange(opcode)) return instruction::branch_and_exchange;
             if (is_block_data_transfer(opcode)) return instruction::block_data_transfer;
-            if (is_branch_and_branch_with_link(opcode)) return instruction::branch_and_branch_with_link;
+            if (is_branch(opcode)) return instruction::branch;
             if (is_software_interupt(opcode)) return instruction::software_interupt;
             if (is_undefined(opcode)) return instruction::undefined;
             if (is_single_data_transfer(opcode)) return instruction::single_data_transfer;
@@ -119,7 +119,7 @@ namespace arm7tdmi {
             switch(instr) {
                 case instruction::branch_and_exchange: return "branch_and_exchange";
                 case instruction::block_data_transfer: return "block_data_transfer";
-                case instruction::branch_and_branch_with_link: return "branch_and_branch_with_link";
+                case instruction::branch: return "branch_and_branch_with_link";
                 case instruction::software_interupt: return "software_interupt";
                 case instruction::undefined: return "undefined";
                 case instruction::single_data_transfer: return "single_data_transfer";

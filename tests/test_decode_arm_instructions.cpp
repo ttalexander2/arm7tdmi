@@ -25,7 +25,7 @@ TEST_CASE("decode_branch_and_branch_with_link", "[arm_instruction]") {
 
     constexpr u32 opcode = 0x000A5190;
     const auto instr = arm7tdmi::arm::decode(opcode);
-    REQUIRE(instr == arm7tdmi::arm::instruction::branch_and_branch_with_link);
+    REQUIRE(instr == arm7tdmi::arm::instruction::branch);
 }
 
 TEST_CASE("decode_software_interupt", "[arm_instruction]") {
