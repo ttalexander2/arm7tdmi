@@ -29,7 +29,7 @@ namespace arm7tdmi {
                 return format == branch_format || format == link_format;
             }
 
-            bool is_software_interupt(const u32 opcode) {
+            bool is_software_interrupt(const u32 opcode) {
                 constexpr u32 format = 0x0f000000;
                 constexpr u32 mask = 0x0f000000;
                 return (opcode & mask) == format;
@@ -100,7 +100,7 @@ namespace arm7tdmi {
             if (is_branch_and_exchange(opcode)) return instruction::branch_and_exchange;
             if (is_block_data_transfer(opcode)) return instruction::block_data_transfer;
             if (is_branch(opcode)) return instruction::branch;
-            if (is_software_interupt(opcode)) return instruction::software_interupt;
+            if (is_software_interrupt(opcode)) return instruction::software_interrupt;
             if (is_undefined(opcode)) return instruction::undefined;
             if (is_single_data_transfer(opcode)) return instruction::single_data_transfer;
             if (is_single_data_swap(opcode)) return instruction::single_data_swap;
@@ -120,7 +120,7 @@ namespace arm7tdmi {
                 case instruction::branch_and_exchange: return "branch_and_exchange";
                 case instruction::block_data_transfer: return "block_data_transfer";
                 case instruction::branch: return "branch_and_branch_with_link";
-                case instruction::software_interupt: return "software_interupt";
+                case instruction::software_interrupt: return "software_interupt";
                 case instruction::undefined: return "undefined";
                 case instruction::single_data_transfer: return "single_data_transfer";
                 case instruction::single_data_swap: return "single_data_swap";

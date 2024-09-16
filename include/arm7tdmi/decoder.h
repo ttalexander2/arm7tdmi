@@ -14,7 +14,7 @@ namespace arm7tdmi {
             branch_and_exchange,
             block_data_transfer,
             branch,
-            software_interupt,
+            software_interrupt,
             undefined,
             single_data_transfer,
             single_data_swap,

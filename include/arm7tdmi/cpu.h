@@ -51,7 +51,7 @@ namespace arm7tdmi {
         void execute_arm_branch_and_exchange(u32 instr);
         void execute_arm_block_data_transfer(u32 instr);
         void execute_arm_branch(u32 instr);
-        void execute_arm_software_interupt(u32 instr);
+        void execute_arm_software_interrupt(u32 instr);
         void execute_arm_undefined(u32 instr);
         void execute_arm_single_data_transfer(u32 instr);
         void execute_arm_single_data_swap(u32 instr);

@@ -12,7 +12,7 @@ namespace arm7tdmi {
             case arm::instruction::branch_and_exchange: execute_arm_branch_and_exchange(opcode); break;
             case arm::instruction::block_data_transfer: execute_arm_block_data_transfer(opcode); break;
             case arm::instruction::branch: execute_arm_branch(opcode); break;
-            case arm::instruction::software_interupt: execute_arm_software_interupt(opcode); break;
+            case arm::instruction::software_interrupt: execute_arm_software_interrupt(opcode); break;
             case arm::instruction::undefined: execute_arm_undefined(opcode); break;
             case arm::instruction::single_data_transfer: execute_arm_single_data_transfer(opcode); break;
             case arm::instruction::single_data_swap: execute_arm_single_data_swap(opcode); break;
@@ -99,7 +99,7 @@ namespace arm7tdmi {
         }
     }
 
-    void cpu::execute_arm_software_interupt(const u32 instr) {
+    void cpu::execute_arm_software_interrupt(const u32 instr) {
     }
 
     void cpu::execute_arm_undefined(const u32 instr) {

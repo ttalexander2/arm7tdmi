@@ -45,7 +45,9 @@ if (DEFINED CACHE{ARM_ASSEMBLER_PATH})
     foreach(item IN LISTS ASSEMBLY_SOURCE)
         get_filename_component(item_file_name ${item} NAME)
         set(ASM_IM "${CMAKE_CURRENT_BINARY_DIR}/${item_file_name}.o")
-        set(ASM_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assembly/${item_file_name}.bin")
+        cmake_path(RELATIVE_PATH item BASE_DIRECTORY "${CMAKE_SOURCE_DIR}/tests" OUTPUT_VARIABLE ASM_OUT_DIR)
+        get_filename_component(ASM_OUT_DIR "${ASM_OUT_DIR}" DIRECTORY)
+        set(ASM_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ASM_OUT_DIR}/${item_file_name}.bin")
         add_custom_command(
                 OUTPUT "${ASM_OUT}"
                 COMMAND ${ARM_ASSEMBLER_PATH}/as.exe ${item} -march=armv4t -o ${ASM_IM} && ${ARM_ASSEMBLER_PATH}/ld.exe ${ASM_IM} -o ${ASM_OUT}
