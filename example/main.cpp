@@ -1,8 +1,9 @@
-#include <fmt/format.h>
+
 
 #include <arm7tdmi/decoder.h>
+#include <arm7tdmi/cpu.h>
 
-#include "arm7tdmi/cpu.h"
+#include <fmt/format.h>
 
 int main() {
 
@@ -18,13 +19,16 @@ int main() {
     const auto multiply_long_instr = arm7tdmi::arm::decode(multiply_long);
     fmt::println("{:#034b} - {}", multiply_long, instruction_to_string(multiply_long_instr));
 
-    arm7tdmi::cpu cpu{};
-    cpu.registers.cpsr = 32;
-    bool c = cpu.registers.cpsr.set_c(false);
-    cpu.registers.pc++;
-    fmt::println("{}, {}", static_cast<u32>(cpu.registers.cpsr), c);
+    arm7tdmi::cpu cpu = {};
+    cpu.registers.cpsr = 32u;
+    fmt::println("{:#034b}", cpu.registers.cpsr);
 
-    fmt::println("cpu size: {}", sizeof(arm7tdmi::cpu) / sizeof(u32));
+    cpu.registers.cpsr.set_c(true);
+    bool c = cpu.registers.cpsr.get_c();
+    cpu.registers.pc++;
+
+    fmt::println("{:#034b}", cpu.registers.cpsr);
+    fmt::println("cpu size: {}, data size: {}, register size: {}", sizeof(arm7tdmi::cpu) / sizeof(u32), 19,  sizeof(arm7tdmi::cpu_register) / sizeof(u32));
 
 
     return 0;

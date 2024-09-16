@@ -63,11 +63,11 @@ namespace arm7tdmi {
         const u32 rn = instr & 0xf;
         assert(rn < 15);
 
-        const cpu_mode exchange_mode = (instr & 1) == 1 ? cpu_mode::thumb : cpu_mode::arm;
+        const cpu_mode exchange_mode = (instr & 1u) == 1u ? cpu_mode::thumb : cpu_mode::arm;
 
         if (mode == cpu_mode::arm && exchange_mode == cpu_mode::thumb)
         {
-            registers.pc = registers.data[rn | static_cast<u32>(1)] - 1; // set bit 0 to 1, use Rn - 1
+            registers.pc = registers.data[rn | 1u] - 1u; // set bit 0 to 1, use Rn - 1
         }
         else
         {
@@ -139,10 +139,10 @@ namespace arm7tdmi {
 
         u32 cond = (instr >> 28) & 0xf;
 
-        const u8 N = registers.cpsr.n();
-        const u8 Z = registers.cpsr.z();
-        const u8 C = registers.cpsr.c();
-        const u8 V = registers.cpsr.v();
+        const u8 N = registers.cpsr.get_n();
+        const u8 Z = registers.cpsr.get_z();
+        const u8 C = registers.cpsr.get_c();
+        const u8 V = registers.cpsr.get_v();
 
         switch(static_cast<condition_code>(cond))
         {
