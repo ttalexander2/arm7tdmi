@@ -45,37 +45,71 @@ namespace arm7tdmi {
         friend struct fmt::formatter<cpu_register>;
     public:
 
-        [[nodiscard]] constexpr inline bool get_n() const { return this->get_bit(CPSR_N); }
-        [[nodiscard]] constexpr inline bool get_z() const { return this->get_bit(CPSR_Z); }
-        [[nodiscard]] constexpr inline bool get_c() const { return this->get_bit(CPSR_C); }
-        [[nodiscard]] constexpr inline bool get_v() const { return this->get_bit(CPSR_V); }
-        [[nodiscard]] constexpr inline bool get_q() const { return this->get_bit(CPSR_Q); }
-        [[nodiscard]] constexpr inline bool get_i() const { return this->get_bit(CPSR_I); }
-        [[nodiscard]] constexpr inline bool get_f() const { return this->get_bit(CPSR_F); }
-        [[nodiscard]] constexpr inline bool get_t() const { return this->get_bit(CPSR_T); }
-        [[nodiscard]] constexpr inline bool get_m4() const { return this->get_bit(CPSR_M4); }
-        [[nodiscard]] constexpr inline bool get_m3() const { return this->get_bit(CPSR_M3); }
-        [[nodiscard]] constexpr inline bool get_m2() const { return this->get_bit(CPSR_M2); }
-        [[nodiscard]] constexpr inline bool get_m1() const { return this->get_bit(CPSR_M1); }
-        [[nodiscard]] constexpr inline bool get_m0() const { return this->get_bit(CPSR_M0); }
+        [[nodiscard]] inline bool get_n() const { return this->get_bit(CPSR_N); }
+        [[nodiscard]] inline bool get_z() const { return this->get_bit(CPSR_Z); }
+        [[nodiscard]] inline bool get_c() const { return this->get_bit(CPSR_C); }
+        [[nodiscard]] inline bool get_v() const { return this->get_bit(CPSR_V); }
+        [[nodiscard]] inline bool get_q() const { return this->get_bit(CPSR_Q); }
+        [[nodiscard]] inline bool get_i() const { return this->get_bit(CPSR_I); }
+        [[nodiscard]] inline bool get_f() const { return this->get_bit(CPSR_F); }
+        [[nodiscard]] inline bool get_t() const { return this->get_bit(CPSR_T); }
+        [[nodiscard]] inline bool get_m4() const { return this->get_bit(CPSR_M4); }
+        [[nodiscard]] inline bool get_m3() const { return this->get_bit(CPSR_M3); }
+        [[nodiscard]] inline bool get_m2() const { return this->get_bit(CPSR_M2); }
+        [[nodiscard]] inline bool get_m1() const { return this->get_bit(CPSR_M1); }
+        [[nodiscard]] inline bool get_m0() const { return this->get_bit(CPSR_M0); }
 
-        constexpr inline void set_n(const bool value) { this->set_bit(CPSR_N, value); }
-        constexpr inline void set_z(const bool value) { this->set_bit(CPSR_Z, value); }
-        constexpr inline void set_c(const bool value) { this->set_bit(CPSR_C, value); }
-        constexpr inline void set_v(const bool value) { this->set_bit(CPSR_V, value); }
-        constexpr inline void set_q(const bool value) { this->set_bit(CPSR_Q, value); }
-        constexpr inline void set_i(const bool value) { this->set_bit(CPSR_I, value); }
-        constexpr inline void set_f(const bool value) { this->set_bit(CPSR_F, value); }
-        constexpr inline void set_t(const bool value) { this->set_bit(CPSR_T, value); }
-        constexpr inline void set_m4(const bool value) { this->set_bit(CPSR_M4, value); }
-        constexpr inline void set_m3(const bool value) { this->set_bit(CPSR_M3, value); }
-        constexpr inline void set_m2(const bool value) { this->set_bit(CPSR_M2, value); }
-        constexpr inline void set_m1(const bool value) { this->set_bit(CPSR_M1, value); }
-        constexpr inline void set_m0(const bool value) { this->set_bit(CPSR_M0, value); }
+        inline void set_n(const bool value) { this->set_bit(CPSR_N, value); }
+        inline void set_z(const bool value) { this->set_bit(CPSR_Z, value); }
+        inline void set_c(const bool value) { this->set_bit(CPSR_C, value); }
+        inline void set_v(const bool value) { this->set_bit(CPSR_V, value); }
+        inline void set_q(const bool value) { this->set_bit(CPSR_Q, value); }
+        inline void set_i(const bool value) { this->set_bit(CPSR_I, value); }
+        inline void set_f(const bool value) { this->set_bit(CPSR_F, value); }
+        inline void set_t(const bool value) { this->set_bit(CPSR_T, value); }
+        inline void set_m4(const bool value) { this->set_bit(CPSR_M4, value); }
+        inline void set_m3(const bool value) { this->set_bit(CPSR_M3, value); }
+        inline void set_m2(const bool value) { this->set_bit(CPSR_M2, value); }
+        inline void set_m1(const bool value) { this->set_bit(CPSR_M1, value); }
+        inline void set_m0(const bool value) { this->set_bit(CPSR_M0, value); }
 
         // ReSharper disable once CppNonExplicitConversionOperator
         operator u32&() { return data;} // NOLINT(*-explicit-constructor)
         cpsr_register &operator=(const u32 value) { data = value; return *this; }
+    };
+
+    struct cpu_register_set {
+        cpu_register r0;
+        cpu_register r1;
+        cpu_register r2;
+        cpu_register r3;
+        cpu_register r4;
+        cpu_register r5;
+        cpu_register r6;
+        cpu_register r7;
+        cpu_register r8;
+        cpu_register r9;
+        cpu_register r10;
+        cpu_register r11;
+        cpu_register r12;
+
+        union {
+            cpu_register r13;
+            cpu_register sp;
+        };
+
+        union {
+            cpu_register r14;
+            cpu_register lr;
+        };
+
+        union {
+            cpu_register r15;
+            cpu_register pc;
+        };
+
+        cpsr_register cpsr;
+        cpu_register spsr;
     };
 }
 

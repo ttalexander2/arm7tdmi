@@ -67,11 +67,11 @@ namespace arm7tdmi {
 
         if (mode == cpu_mode::arm && exchange_mode == cpu_mode::thumb)
         {
-            registers.pc = registers.data[rn | 1u] - 1u; // set bit 0 to 1, use Rn - 1
+            registers.pc = register_data[rn | 1u] - 1u; // set bit 0 to 1, use Rn - 1
         }
         else
         {
-            registers.pc = registers.data[rn]; // Either in same mode, or switching to arm, use Rn
+            registers.pc = register_data[rn]; // Either in same mode, or switching to arm, use Rn
         }
 
         // if bit 0 of RN == 1 subsequent instructions are THUMB, else ARM

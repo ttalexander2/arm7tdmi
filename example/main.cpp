@@ -1,9 +1,12 @@
 
 
+#include <fstream>
 #include <arm7tdmi/decoder.h>
 #include <arm7tdmi/cpu.h>
 
 #include <fmt/format.h>
+
+
 
 int main() {
 

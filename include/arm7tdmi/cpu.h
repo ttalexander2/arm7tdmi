@@ -38,48 +38,12 @@ namespace arm7tdmi {
             never = 15
         };
 
-        // Storage for registers
-        struct
-        {
-            union { // Using a union here to have multiple aliases for accessing registers.
-                u32 data[18] = {};
+        union { // Using a union here to have multiple aliases for accessing registers.
+            u32 register_data[18] = {};
+            cpu_register_set registers;
+        };
 
-                struct {
-                    cpu_register r0;
-                    cpu_register r1;
-                    cpu_register r2;
-                    cpu_register r3;
-                    cpu_register r4;
-                    cpu_register r5;
-                    cpu_register r6;
-                    cpu_register r7;
-                    cpu_register r8;
-                    cpu_register r9;
-                    cpu_register r10;
-                    cpu_register r11;
-                    cpu_register r12;
 
-                    union {
-                        cpu_register r13;
-                        cpu_register sp;
-                    };
-
-                    union {
-                        cpu_register r14;
-                        cpu_register lr;
-                    };
-
-                    union {
-                        cpu_register r15;
-                        cpu_register pc;
-                    };
-
-                    cpsr_register cpsr;
-                    cpu_register spsr;
-                };
-            };
-
-        } registers {};
 
         void execute(arm::instruction instr, u32 opcode);
         void execute(thumb::instruction instr, u16 opcode);
