@@ -33,9 +33,10 @@ target_link_libraries(tests PRIVATE arm7tdmi Catch2::Catch2WithMain fmt::fmt)
 catch_discover_tests(tests)
 
 SET(ARM_ASSEMBLER_PATH "" CACHE PATH "Arm GNU Toolchain path (arm-none-eabi)")
-message(STATUS  "Using ARM assembler in: ${ARM_ASSEMBLER_PATH}")
 
 if (DEFINED CACHE{ARM_ASSEMBLER_PATH})
+    message(STATUS  "Using ARM assembler in: ${ARM_ASSEMBLER_PATH}")
+
     add_compile_definitions(-DTEST_COMPILED_ASSEMBLY)
     file(GLOB_RECURSE ASSEMBLY_SOURCE CONFIGURE_DEPENDS *.s)
 
@@ -56,7 +57,7 @@ if (DEFINED CACHE{ARM_ASSEMBLER_PATH})
         set(ASM_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ASM_OUT_DIR}/${item_file_name}.bin")
         add_custom_command(
                 OUTPUT "${ASM_OUT}"
-                COMMAND ${ARM_ASSEMBLER_PATH}/as${EX_END} ${item} -march=armv4t -o ${ASM_IM} && ${ARM_ASSEMBLER_PATH}/ld${EX_END} ${ASM_IM} -o ${ASM_OUT}
+                COMMAND ${ARM_ASSEMBLER_PATH}/arm-none-eabi-as${EX_END} ${item} -march=armv4t -o ${ASM_IM} && ${ARM_ASSEMBLER_PATH}/arm-none-eabi-ld${EX_END} ${ASM_IM} -o ${ASM_OUT}
                 DEPENDS "${item}"
         )
         list(APPEND ASSEMBLY_BINARY_FILES ${ASM_OUT})

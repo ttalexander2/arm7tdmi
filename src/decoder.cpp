@@ -48,7 +48,7 @@ namespace arm7tdmi {
             }
 
             bool is_single_data_swap(const u32 opcode) {
-                constexpr u32 format = 0x00000090;
+                constexpr u32 format = 0x01000090;
                 constexpr u32 mask = 0x0f800ff0;
                 return (opcode & mask) == format;
             }
