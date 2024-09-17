@@ -39,6 +39,12 @@ if (DEFINED CACHE{ARM_ASSEMBLER_PATH})
     add_compile_definitions(-DTEST_COMPILED_ASSEMBLY)
     file(GLOB_RECURSE ASSEMBLY_SOURCE CONFIGURE_DEPENDS *.s)
 
+    if (WIN32)
+        set(EX_END ".exe")
+    elseif(UNIX)
+        set(EX_END "")
+    endif()
+
     add_custom_target(make-asm-output-dir ALL
             COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assembly")
 
@@ -50,7 +56,7 @@ if (DEFINED CACHE{ARM_ASSEMBLER_PATH})
         set(ASM_OUT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${ASM_OUT_DIR}/${item_file_name}.bin")
         add_custom_command(
                 OUTPUT "${ASM_OUT}"
-                COMMAND ${ARM_ASSEMBLER_PATH}/as.exe ${item} -march=armv4t -o ${ASM_IM} && ${ARM_ASSEMBLER_PATH}/ld.exe ${ASM_IM} -o ${ASM_OUT}
+                COMMAND ${ARM_ASSEMBLER_PATH}/as${EX_END} ${item} -march=armv4t -o ${ASM_IM} && ${ARM_ASSEMBLER_PATH}/ld${EX_END} ${ASM_IM} -o ${ASM_OUT}
                 DEPENDS "${item}"
         )
         list(APPEND ASSEMBLY_BINARY_FILES ${ASM_OUT})

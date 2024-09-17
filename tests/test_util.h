@@ -31,13 +31,3 @@ inline std::vector<T> read_binary_from_file(const std::string& filename) {
     inputFile.close();
     return buffer;
 }
-
-bool is_big_endian(void)
-{
-    union {
-        uint32_t i;
-        char c[4];
-    } bint = {0x01020304};
-
-    return bint.c[0] == 1;
-}

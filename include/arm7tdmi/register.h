@@ -74,8 +74,9 @@ namespace arm7tdmi {
         inline void set_m0(const bool value) { this->set_bit(CPSR_M0, value); }
 
         // ReSharper disable once CppNonExplicitConversionOperator
-        operator u32&() { return data;} // NOLINT(*-explicit-constructor)
-        cpsr_register &operator=(const u32 value) { data = value; return *this; }
+        inline operator u32&() { return data;} // NOLINT(*-explicit-constructor)
+        inline operator const u32&() const { return data;} // NOLINT(*-explicit-constructor)
+        inline cpsr_register &operator=(const u32 value) { data = value; return *this; }
     };
 
     struct cpu_register_set {

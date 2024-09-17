@@ -15,6 +15,8 @@
 // executables are used from arm-none-eabi to compile/link the assembly into a binary. Path to
 // the toolchain can be configured by passing in -DARM_ASSEMBLER_PATH="my/path/to/toolchain" into
 // cmake. Most assembly code is taken from the instruction examples in the arm7tdmi manual.
+//
+// Use: Arm Toolchain 10.3.1
 
 #ifdef TEST_COMPILED_ASSEMBLY
 
@@ -67,10 +69,12 @@ TEST_CASE("arm_decode_single_data_transfer", "[arm_instruction]") {
 }
 
 TEST_CASE("arm_decode_single_data_swap", "[arm_instruction]") {
-
-    constexpr u32 opcode = 0x000A5190;
-    const auto instr = arm7tdmi::arm::decode(opcode);
-    REQUIRE(instr == arm7tdmi::arm::instruction::single_data_swap);
+    const auto data = read_binary_from_file<u32>("assembly/arm/test_single_data_swap.s.bin");
+    for (int i = 0; i < 3; ++i) {
+        u32 opcode = data[entrypoint + i];
+        const auto instr = arm7tdmi::arm::decode(opcode);
+        REQUIRE(instr == arm7tdmi::arm::instruction::single_data_swap);
+    }
 }
 
 TEST_CASE("arm_decode_multiply", "[arm_instruction]") {

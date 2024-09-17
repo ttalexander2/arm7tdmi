@@ -2,6 +2,5 @@
 .global _start
 
 _start:
-    BX r0
-    BX r5
-    BX r2
+    MUL R1,R2,R3
+    MLAEQS R1,R2,R3,R4

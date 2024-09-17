@@ -6,7 +6,15 @@
 
 #include <fmt/format.h>
 
+bool is_big_endian(void)
+{
+    union {
+        uint32_t i;
+        char c[4];
+    } bint = {0x01020304};
 
+    return bint.c[0] == 1;
+}
 
 int main() {
 
@@ -33,6 +41,7 @@ int main() {
     fmt::println("{:#034b}", cpu.registers.cpsr);
     fmt::println("cpu size: {}, data size: {}, register size: {}", sizeof(arm7tdmi::cpu) / sizeof(u32), 19,  sizeof(arm7tdmi::cpu_register) / sizeof(u32));
 
+    fmt::println("Endianness: {}", is_big_endian() ? "big" : "little");
 
     return 0;
 }
