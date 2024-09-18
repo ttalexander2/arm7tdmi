@@ -150,22 +150,20 @@ TEST_CASE("thumb_decode_move_compare_add_subtract_immediate", "[thumb_instructio
     }
 }
 TEST_CASE("thumb_decode_add_subtract", "[thumb_instruction]") {
-
-    constexpr u16 opcode = 0x5190;
-    const auto instr = arm7tdmi::thumb::decode(opcode);
-    REQUIRE(instr == arm7tdmi::thumb::instruction::add_subtract);
+    const auto data = read_binary_from_file<u16>("assembly/thumb/test_thumb_decode_add_subtract.s.bin");
+    for (int i = 0; i < 4; ++i) {
+        const u16 opcode = data[entrypoint + i];
+        const auto instr = arm7tdmi::thumb::decode(opcode);
+        REQUIRE(instr == arm7tdmi::thumb::instruction::add_subtract);
+    }
 }
 TEST_CASE("thumb_decode_move_shifted_register", "[thumb_instruction]") {
-
-    constexpr u16 opcode = 0x5190;
-    const auto instr = arm7tdmi::thumb::decode(opcode);
-    REQUIRE(instr == arm7tdmi::thumb::instruction::move_shifted_register);
-}
-TEST_CASE("thumb_decode_unknown", "[thumb_instruction]") {
-
-    constexpr u16 opcode = 0x5190;
-    const auto instr = arm7tdmi::thumb::decode(opcode);
-    REQUIRE(instr == arm7tdmi::thumb::instruction::unknown);
+    const auto data = read_binary_from_file<u16>("assembly/thumb/test_thumb_decode_move_shifted_register.s.bin");
+    for (int i = 0; i < 3; ++i) {
+        const u16 opcode = data[entrypoint + i];
+        const auto instr = arm7tdmi::thumb::decode(opcode);
+        REQUIRE(instr == arm7tdmi::thumb::instruction::move_shifted_register);
+    }
 }
 
 #endif

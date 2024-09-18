@@ -1,5 +1,6 @@
 .section .text
 .thumb
+.align 8
 .global _start
 
 _start:
