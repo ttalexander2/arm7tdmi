@@ -7,7 +7,7 @@
 
 #include <arm7tdmi/decoder.h>
 
-#include "test_util.h"
+#include "utility.h"
 #include "fmt/compile.h"
 
 // NOTE(Thomas): These test the decoding of a single instruction, using the provided arm assembly code.
@@ -23,8 +23,8 @@
 
 constexpr u32 entrypoint = 0x8000 / sizeof(u32);
 
-TEST_CASE("arm_decode_branch_and_exchange", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_branch_and_exchange.s.bin");
+TEST_CASE("arm_decode_branch_and_exchange", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_branch_and_exchange.s.bin");
     for (int i = 0; i < 3; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -32,8 +32,8 @@ TEST_CASE("arm_decode_branch_and_exchange", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_block_data_transfer", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_block_data_transfer.s.bin");
+TEST_CASE("arm_decode_block_data_transfer", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_block_data_transfer.s.bin");
     for (int i = 0; i < 5; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -42,8 +42,8 @@ TEST_CASE("arm_decode_block_data_transfer", "[arm_instruction]") {
 
 }
 
-TEST_CASE("arm_decode_branch", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_branch.s.bin");
+TEST_CASE("arm_decode_branch", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_branch.s.bin");
     for (int i = 0; i < 5; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -51,8 +51,8 @@ TEST_CASE("arm_decode_branch", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_software_interrupt", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_software_interrupt.s.bin");
+TEST_CASE("arm_decode_software_interrupt", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_software_interrupt.s.bin");
     for (int i = 0; i < 2; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -60,8 +60,8 @@ TEST_CASE("arm_decode_software_interrupt", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_single_data_transfer", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_single_data_transfer.s.bin");
+TEST_CASE("arm_decode_single_data_transfer", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_single_data_transfer.s.bin");
     for (int i = 0; i < 5; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -69,8 +69,8 @@ TEST_CASE("arm_decode_single_data_transfer", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_single_data_swap", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_single_data_swap.s.bin");
+TEST_CASE("arm_decode_single_data_swap", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_single_data_swap.s.bin");
     for (int i = 0; i < 3; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -78,8 +78,8 @@ TEST_CASE("arm_decode_single_data_swap", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_multiply", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_multiply.s.bin");
+TEST_CASE("arm_decode_multiply", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_multiply.s.bin");
     for (int i = 0; i < 3; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -87,8 +87,8 @@ TEST_CASE("arm_decode_multiply", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_multiply_long", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_multiply_long.s.bin");
+TEST_CASE("arm_decode_multiply_long", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_multiply_long.s.bin");
     for (int i = 0; i < 2; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -96,8 +96,8 @@ TEST_CASE("arm_decode_multiply_long", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_halfword_data_transfer_register", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_halfword_data_transfer_register.s.bin");
+TEST_CASE("arm_decode_halfword_data_transfer_register", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_halfword_data_transfer_register.s.bin");
     for (int i = 0; i < 2; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -105,8 +105,8 @@ TEST_CASE("arm_decode_halfword_data_transfer_register", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_halfword_data_transfer_immediate", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_halfword_data_transfer_immediate.s.bin");
+TEST_CASE("arm_decode_halfword_data_transfer_immediate", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_halfword_data_transfer_immediate.s.bin");
     for (int i = 0; i < 2; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -114,8 +114,8 @@ TEST_CASE("arm_decode_halfword_data_transfer_immediate", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_psr_transfer_mrs", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_psr_transfer_mrs.s.bin");
+TEST_CASE("arm_decode_psr_transfer_mrs", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_psr_transfer_mrs.s.bin");
     for (int i = 0; i < 4; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
@@ -123,16 +123,16 @@ TEST_CASE("arm_decode_psr_transfer_mrs", "[arm_instruction]") {
     }
 }
 
-TEST_CASE("arm_decode_psr_transfer_msr", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_psr_transfer_msr.s.bin");
+TEST_CASE("arm_decode_psr_transfer_msr", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_psr_transfer_msr.s.bin");
     for (int i = 0; i < 7; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);
         REQUIRE(instr == arm7tdmi::arm::instruction::psr_transfer_msr);
     }
 }
-TEST_CASE("arm_decode_data_processing", "[arm_instruction]") {
-    const auto data = read_binary_from_file<u32>("assembly/arm/test_decode_data_processing.s.bin");
+TEST_CASE("arm_decode_data_processing", "[decode]") {
+    const auto data = read_binary_from_file<u32>("assembly/arm/decode/test_decode_data_processing.s.bin");
     for (int i = 0; i < 5; ++i) {
         u32 opcode = data[entrypoint + i];
         const auto instr = arm7tdmi::arm::decode(opcode);

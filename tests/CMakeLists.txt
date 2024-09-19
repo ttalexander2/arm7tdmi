@@ -25,8 +25,10 @@ include(Catch)
 add_executable(tests
         test_decode_arm_instructions.cpp
         test_decode_thumb_instructions.cpp
-        test_util.h
-        test_util.h)
+        utility.h
+        utility.h
+        test_arm_instructions.cpp
+        test_arm_instructions.cpp)
 
 target_link_libraries(tests PRIVATE arm7tdmi Catch2::Catch2WithMain fmt::fmt)
 

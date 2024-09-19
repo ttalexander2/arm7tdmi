@@ -87,15 +87,15 @@ namespace arm7tdmi {
         if (!check_condition(instr))
             return;
 
-        const u32 opcode = (instr >> 23) & 1;
+        const u32 opcode = (instr >> 24u) & 1u;
 
-        const u32 offset = instr & 0x00ffffff;
+        const i32 offset = twos_compliment(instr, 24);
+        const u32 calling_pc = registers.pc;
+        registers.pc = calling_pc + 8u + offset * 4u;
 
-        registers.pc = registers.pc + 8 + offset * 4;
-
-        if (opcode == 1) // branch with link - return address in REG_LR
+        if (opcode == 1u) // branch with link - return address in REG_LR
         {
-            registers.lr = registers.pc + 4;
+            registers.lr = calling_pc + 4u;
         }
     }
 
