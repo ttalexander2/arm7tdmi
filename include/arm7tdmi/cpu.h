@@ -38,7 +38,7 @@ namespace arm7tdmi {
             never = 15
         };
 
-        union { // Using a union here to have multiple aliases for accessing registers.
+        union {
             u32 register_data[18] = {};
             cpu_register_set registers;
         };

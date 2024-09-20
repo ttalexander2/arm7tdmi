@@ -34,9 +34,9 @@ target_link_libraries(tests PRIVATE arm7tdmi Catch2::Catch2WithMain fmt::fmt)
 
 catch_discover_tests(tests)
 
-SET(ARM_ASSEMBLER_PATH "" CACHE PATH "Arm GNU Toolchain path (arm-none-eabi)")
+set(ARM_ASSEMBLER_PATH "" PATH "Arm GNU Toolchain path (arm-none-eabi)")
 
-if (DEFINED CACHE{ARM_ASSEMBLER_PATH})
+if (IS_DIRECTORY(ARM_ASSEMBLER_PATH))
     message(STATUS  "Using ARM assembler in: ${ARM_ASSEMBLER_PATH}")
 
     add_compile_definitions(-DTEST_COMPILED_ASSEMBLY)
@@ -73,5 +73,6 @@ if (DEFINED CACHE{ARM_ASSEMBLER_PATH})
     add_dependencies(tests assembly)
 else()
 endif()
+unset(ARM_ASSEMBLER_PATH CACHE)
 
 
