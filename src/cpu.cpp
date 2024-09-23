@@ -61,7 +61,9 @@ namespace arm7tdmi {
 
         // register number
         const u32 rn = instr & 0xf;
-        assert(rn < 15);
+        if (rn >= 15u) {
+            // TODO(Thomas): assert register should be 0-14
+        }
 
         const cpu_mode exchange_mode = (instr & 1u) == 1u ? cpu_mode::thumb : cpu_mode::arm;
 
