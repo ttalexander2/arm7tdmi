@@ -5,7 +5,11 @@
 #include <arm7tdmi/cpu.h>
 
 namespace arm7tdmi {
+    cpu::cpu() {
+    }
 
+    cpu::~cpu() {
+    }
 
     void cpu::execute(const arm::instruction instr, const u32 opcode) {
         switch(instr) {
@@ -67,7 +71,7 @@ namespace arm7tdmi {
 
         const cpu_mode exchange_mode = (register_data[rn] & 1u) == 1u ? cpu_mode::thumb : cpu_mode::arm;
 
-        if (mode == cpu_mode::arm && exchange_mode == cpu_mode::thumb)
+        if (_mode == cpu_mode::arm && exchange_mode == cpu_mode::thumb)
         {
             registers.pc = register_data[rn] - 1u; // set bit 0 to 1, use Rn - 1
         }
@@ -77,10 +81,31 @@ namespace arm7tdmi {
         }
 
         // if bit 0 of RN == 1 subsequent instructions are THUMB, else ARM
-        mode = exchange_mode;
+        _mode = exchange_mode;
     }
 
     void cpu::execute_arm_block_data_transfer(const u32 instr) {
+        if (!check_condition(instr))
+            return;
+
+        u8 register_list [16] = {};
+        u8 register_list_n = 0;
+
+        for (u32 i = 0; i < 16; ++i) {
+            if (util::bit_check(instr, i)) {
+                register_list[register_list_n] = i;
+                register_list_n++;
+            }
+        }
+
+        u8 base_register = (instr >> 16) & 0xf;
+        bool load_store = util::bit_check(instr, 20u);
+        bool write_back = util::bit_check(instr, 21u);
+        bool psr_and_force_user = util::bit_check(instr, 22u);
+        bool up_down = util::bit_check(instr, 23u);
+        bool pre_post_indexing = util::bit_check(instr, 24u);
+
+
 
     }
 
@@ -89,9 +114,9 @@ namespace arm7tdmi {
         if (!check_condition(instr))
             return;
 
-        const u32 opcode = (instr >> 24u) & 1u;
+        const u32 opcode = util::bit_check(instr, 24);
 
-        const i32 offset = twos_compliment(instr, 24);
+        const i32 offset = util::twos_compliment(instr, 24);
         const u32 calling_pc = registers.pc;
         registers.pc = calling_pc + 8u + offset * 4u;
 

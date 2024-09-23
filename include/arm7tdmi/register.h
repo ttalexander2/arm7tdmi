@@ -16,10 +16,10 @@ namespace arm7tdmi {
         u32 data = {};
     public:
 
-        inline void set_bit(const u32 n, const bool value) { data = bit_set_to(data, n, value);};
-        [[nodiscard]] inline bool get_bit(const u32 n) const { return bit_check(data, n); }
-        inline void flip_bit(const u32 n) { data = bit_toggle(data, n); }
-        inline void reset_bit(const u32 n) { data = bit_set_to(data, n, false); }
+        inline void set_bit(const u32 n, const bool value) { data = util::bit_set_to(data, n, value);};
+        [[nodiscard]] inline bool get_bit(const u32 n) const { return util::bit_check(data, n); }
+        inline void flip_bit(const u32 n) { data = util::bit_toggle(data, n); }
+        inline void reset_bit(const u32 n) { data = util::bit_set_to(data, n, false); }
 
         // ReSharper disable once CppNonExplicitConversionOperator
         inline operator u32&() { return data;} // NOLINT(*-explicit-constructor)

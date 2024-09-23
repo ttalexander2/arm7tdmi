@@ -43,9 +43,10 @@ namespace arm7tdmi {
             cpu_register_set registers;
         };
 
-        cpu() {};
+        cpu();
+        ~cpu();
 
-        [[nodiscard]] inline cpu_mode get_mode() const { return mode; };
+        [[nodiscard]] inline cpu_mode get_mode() const { return _mode; };
 
         void execute(arm::instruction instr, u32 opcode);
         void execute(thumb::instruction instr, u16 opcode);
@@ -90,7 +91,7 @@ namespace arm7tdmi {
         void execute_thumb_unknown(u16 instr);
 
     private:
-        cpu_mode mode = cpu_mode::arm;
+        cpu_mode _mode = cpu_mode::arm;
 
     };
 
