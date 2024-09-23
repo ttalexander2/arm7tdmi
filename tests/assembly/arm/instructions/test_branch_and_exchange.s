@@ -4,6 +4,8 @@
 _start:
     ADR R0, Into_THUMB + 1
     BX R0
+    ADR R1, Into_ARM
+    BX R1
 
 .thumb
 Into_THUMB:

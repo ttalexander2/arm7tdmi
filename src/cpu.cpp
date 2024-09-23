@@ -65,11 +65,11 @@ namespace arm7tdmi {
             // TODO(Thomas): assert register should be 0-14
         }
 
-        const cpu_mode exchange_mode = (instr & 1u) == 1u ? cpu_mode::thumb : cpu_mode::arm;
+        const cpu_mode exchange_mode = (register_data[rn] & 1u) == 1u ? cpu_mode::thumb : cpu_mode::arm;
 
         if (mode == cpu_mode::arm && exchange_mode == cpu_mode::thumb)
         {
-            registers.pc = register_data[rn | 1u] - 1u; // set bit 0 to 1, use Rn - 1
+            registers.pc = register_data[rn] - 1u; // set bit 0 to 1, use Rn - 1
         }
         else
         {

@@ -45,6 +45,8 @@ namespace arm7tdmi {
 
         cpu() {};
 
+        [[nodiscard]] inline cpu_mode get_mode() const { return mode; };
+
         void execute(arm::instruction instr, u32 opcode);
         void execute(thumb::instruction instr, u16 opcode);
 

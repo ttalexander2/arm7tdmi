@@ -67,4 +67,35 @@ TEST_CASE("arm_instruction_branch", "[arm instructions]")
 
 }
 
+TEST_CASE("arm_instruction_branch_and_exchange", "[arm instructions]")
+{
+    const auto data = read_binary_from_file<u32>("assembly/arm/instructions/test_branch_and_exchange.s.bin");
+    {
+        arm7tdmi::cpu cpu{};
+        cpu.registers.pc = 0x8004; // BX r0
+
+        // Since we're switching to thumb, we expect the address to be misalligned by 1
+        // This matches the expected usage of BX, where we would first store the
+        // Destination label + 1 to switch to thumb
+        cpu.registers.r0 = 0x8010 + 1u;
+
+        const u32 b = data[cpu.registers.pc / sizeof(u32)];
+        cpu.execute_arm_branch_and_exchange(b);
+        REQUIRE(cpu.registers.pc == 0x8010);
+        REQUIRE(cpu.get_mode() == arm7tdmi::cpu::cpu_mode::thumb);
+    }
+    {
+        arm7tdmi::cpu cpu{};
+        cpu.registers.pc = 0x800c; // BX r1
+
+        // Since we're branching to another ARM section, we'll just store the address
+        cpu.registers.r1 = 0x8014;
+
+        const u32 b = data[cpu.registers.pc / sizeof(u32)];
+        cpu.execute_arm_branch_and_exchange(b);
+        REQUIRE(cpu.registers.pc == 0x8014);
+        REQUIRE(cpu.get_mode() == arm7tdmi::cpu::cpu_mode::arm);
+    }
+}
+
 #endif
