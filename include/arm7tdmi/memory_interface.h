@@ -17,8 +17,8 @@ namespace arm7tdmi {
         void deallocate(const u32* p) noexcept;
     };
 
-    template <typename Size = std::integral_constant, typename Allocator = allocator>
-    class memory_interface {
+    template <u32 Size, typename Allocator = allocator>
+    class memory_interface final {
         static_assert(std::is_same_v<decltype(&Allocator::allocate),
                              u32* (Allocator::*)(u64)>, "Allocator must include 'allocate' function: u32* allocate(uint64_t)");
         static_assert(std::is_same_v<decltype(&Allocator::deallocate),
@@ -26,12 +26,18 @@ namespace arm7tdmi {
         friend class cpu;
     public:
         memory_interface();
+        ~memory_interface();
     private:
         u32* data = nullptr;
     };
 
-    template<typename Size, typename Allocator>
+    template<u32 Size, typename Allocator>
     memory_interface<Size, Allocator>::memory_interface() {
         data = Allocator::allocate(Size);
+    }
+
+    template<u32 Size, typename Allocator>
+    memory_interface<Size, Allocator>::~memory_interface() {
+        Allocator::deallocate(data);
     }
 }
