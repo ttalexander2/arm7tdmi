@@ -105,6 +105,10 @@ namespace arm7tdmi {
         bool up_down = util::bit_check(instr, 23u);
         bool pre_post_indexing = util::bit_check(instr, 24u);
 
+        if (_memory.data)
+        {
+            _memory.data[registers.sp++] = 0;
+        }
 
 
     }

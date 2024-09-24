@@ -5,10 +5,13 @@
 #pragma once
 
 #include "decoder.h"
+#include "memory_interface.h"
 #include "types.h"
 #include "register.h"
 
 namespace arm7tdmi {
+
+
 
     class cpu {
     public:
@@ -94,5 +97,4 @@ namespace arm7tdmi {
         cpu_mode _mode = cpu_mode::arm;
 
     };
-
 }
