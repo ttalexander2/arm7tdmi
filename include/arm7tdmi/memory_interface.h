@@ -14,8 +14,8 @@ namespace arm7tdmi {
 
     class allocator {
     public:
-        [[nodiscard]] u32* allocate(u64 n) noexcept;
-        void deallocate(const u32* p) noexcept;
+        [[nodiscard]] static u32* allocate(u64 n) noexcept;
+        static void deallocate(const u32* p) noexcept;
     };
 
     template <typename Allocator = allocator>

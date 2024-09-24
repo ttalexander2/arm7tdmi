@@ -4,16 +4,24 @@
 
 #pragma once
 
+#include <functional>
+
 #include "decoder.h"
 #include "memory_interface.h"
 #include "types.h"
 #include "register.h"
+#include "util.h"
 
 namespace arm7tdmi {
 
 
 
-    class cpu {
+    class cpu final {
+        template <typename R, typename E>
+        friend class expected;
+
+        friend class std::variant<cpu, error>;
+
     public:
 
         enum class cpu_mode : u8 {
@@ -46,10 +54,12 @@ namespace arm7tdmi {
             cpu_register_set registers;
         };
 
-        cpu();
+        template<class Allocator = allocator>
+        static std::unique_ptr<cpu> create(u64 memory_size);
+
         ~cpu();
 
-        [[nodiscard]] inline cpu_mode get_mode() const { return _mode; };
+        [[nodiscard]] inline cpu_mode get_mode() const { return _mode; }
 
         void execute(arm::instruction instr, u32 opcode);
         void execute(thumb::instruction instr, u16 opcode);
@@ -94,7 +104,25 @@ namespace arm7tdmi {
         void execute_thumb_unknown(u16 instr);
 
     private:
+        cpu(u32* memory, u64 size, std::function<void(cpu&)> destructor);
+        cpu(const cpu& other);
+
         cpu_mode _mode = cpu_mode::arm;
+        u32* _memory = nullptr;
+        const u64 _memory_size = 0;
+        std::function<void(cpu&)> _destructor;
 
     };
+
+    template<typename Allocator>
+    std::unique_ptr<cpu> cpu::create(const u64 memory_size) {
+        u32* memory = Allocator::allocate(memory_size);
+        if (memory == nullptr) {
+            return nullptr;
+        }
+
+        // ReSharper disable once CppSmartPointerVsMakeFunction - constructor is private
+        return std::unique_ptr<cpu>(new cpu(memory, memory_size, [](cpu& self) { Allocator::deallocate(self._memory); }));
+
+    }
 }

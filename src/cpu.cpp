@@ -2,13 +2,23 @@
 // Created by talexander on 9/9/2024.
 //
 #include <cassert>
+#include <utility>
 #include <arm7tdmi/cpu.h>
 
 namespace arm7tdmi {
-    cpu::cpu() {
+    cpu::cpu(u32* memory, const u64 size, std::function<void(cpu&)> destructor) : _memory(memory), _memory_size(size), _destructor(std::move(destructor)) {
+    }
+
+    cpu::cpu(const cpu &other) : registers(other.registers), _memory(other._memory), _memory_size(other._memory_size), _destructor(other._destructor) {
+        auto& o = const_cast<cpu&>(other);
+        o._memory = nullptr;
     }
 
     cpu::~cpu() {
+        if (_memory) {
+            _destructor(*this);
+        }
+
     }
 
     void cpu::execute(const arm::instruction instr, const u32 opcode) {
@@ -105,9 +115,9 @@ namespace arm7tdmi {
         bool up_down = util::bit_check(instr, 23u);
         bool pre_post_indexing = util::bit_check(instr, 24u);
 
-        if (_memory.data)
+        if (_memory && registers.sp + 1 < _memory_size)
         {
-            _memory.data[registers.sp++] = 0;
+            _memory[registers.sp++] = 0;
         }
 
 

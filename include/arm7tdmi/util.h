@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <climits>
+#include <variant>
 
 namespace arm7tdmi::util
 {
@@ -135,5 +136,8 @@ namespace arm7tdmi::util
         return t - (t >> 23 << 24);
     }
 
+}
+
+namespace arm7tdmi {
 
 }

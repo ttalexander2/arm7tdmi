@@ -17,3 +17,14 @@ typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
+
+namespace arm7tdmi {
+    enum class error : u8 {
+        ALLOCATION_ERROR,
+    };
+
+    const char * error_to_string(error instr);
+
+}
+
+inline auto format_as(const arm7tdmi::error f) { return arm7tdmi::error_to_string(f); }
