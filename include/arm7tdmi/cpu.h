@@ -54,8 +54,12 @@ namespace arm7tdmi {
             cpu_register_set registers;
         };
 
+
+        // TODO(Thomas): We probably don't actually want to return a pointer, since any memory will be stored
+        // on the heap regardless, we would definitely prefer that the CPU is passed directly so all registers
+        // are stored on the stack.
         template<class Allocator = allocator>
-        static std::unique_ptr<cpu> create(u64 memory_size);
+        static std::unique_ptr<cpu> create(u64 memory_size = 2056u * sizeof(u32));
 
         ~cpu();
 

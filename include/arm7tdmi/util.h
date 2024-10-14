@@ -132,7 +132,7 @@ namespace arm7tdmi::util
     }
 
     inline i32 twos_compliment(const u32 x, const u32 bits = 31) {
-        const int32_t t = x & ((1u << bits) - 1);
+        const i32 t = static_cast<i32>(x & ((1u << bits) - 1));
         return t - (t >> 23 << 24);
     }
 
