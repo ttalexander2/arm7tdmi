@@ -55,7 +55,7 @@ namespace arm7tdmi {
         };
 
 
-        // TODO(Thomas): Should probably not return a pointer, we don't want registers on the stack.
+        // TODO(Thomas): Should probably not return a pointer, we don't want registers on the heap.
         template<class Allocator = allocator>
         static std::unique_ptr<cpu> create(u64 memory_size = 2056u * sizeof(u32));
 
