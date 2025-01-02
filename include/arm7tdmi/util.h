@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "types.h"
+#include <arm7tdmi/common.h>
 
 #include <cstdint>
 #include <climits>

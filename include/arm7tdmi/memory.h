@@ -7,7 +7,6 @@
 #include <type_traits>
 
 #include <arm7tdmi/common.h>
-#include "types.h"
 
 namespace arm7tdmi {
 

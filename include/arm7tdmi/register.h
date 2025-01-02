@@ -3,10 +3,10 @@
 //
 #pragma once
 
-#include <arm7tdmi/types.h>
-#include <fmt/format.h>
+#include <arm7tdmi/common.h>
+#include <arm7tdmi/util.h>
 
-#include "util.h"
+#include <fmt/format.h>
 
 namespace arm7tdmi {
 

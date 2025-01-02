@@ -2,8 +2,7 @@
 // Created by talexander on 9/23/2024.
 //
 #include <arm7tdmi/memory.h>
-
-#include "arm7tdmi/cpu.h"
+#include <arm7tdmi/cpu.h>
 
 namespace arm7tdmi {
     basic_memory::basic_memory(u64 size) : _size(size) {
