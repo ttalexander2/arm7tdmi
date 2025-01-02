@@ -4,17 +4,14 @@
 
 #pragma once
 
-#include <functional>
-
+#include <arm7tdmi/common.h>
 #include "decoder.h"
-#include "memory_interface.h"
-#include "types.h"
 #include "register.h"
 #include "util.h"
 
 namespace arm7tdmi {
 
-
+    class memory_interface;
 
     class cpu final {
         template <typename R, typename E>
@@ -24,41 +21,12 @@ namespace arm7tdmi {
 
     public:
 
-        enum class cpu_mode : u8 {
-            arm,
-            thumb
-        };
-
-        enum class condition_code : u8
-        {
-            equal = 0,
-            nequal = 1,
-            unsigned_higher_or_same = 2,
-            unsigned_lower = 3,
-            negative = 4,
-            positive_or_zero = 5,
-            overflow = 6,
-            no_overflow = 7,
-            unsigned_higher = 8,
-            unsigned_lower_or_same = 9,
-            greater_or_equal = 10,
-            less_than = 11,
-            greater_than = 12,
-            less_than_or_equal = 13,
-            always = 14,
-            never = 15
-        };
-
         union {
             u32 register_data[18] = {};
             cpu_register_set registers;
         };
 
-
-        // TODO(Thomas): Should probably not return a pointer, we don't want registers on the heap.
-        template<class Allocator = allocator>
-        static std::unique_ptr<cpu> create(u64 memory_size = 2056u * sizeof(u32));
-
+        explicit cpu(memory_interface* memory);
         ~cpu();
 
         [[nodiscard]] inline cpu_mode get_mode() const { return _mode; }
@@ -106,25 +74,8 @@ namespace arm7tdmi {
         void execute_thumb_unknown(u16 instr);
 
     private:
-        cpu(u32* memory, u64 size, std::function<void(cpu&)> destructor);
-        cpu(const cpu& other);
-
         cpu_mode _mode = cpu_mode::arm;
-        u32* _memory = nullptr;
-        const u64 _memory_size = 0;
-        std::function<void(cpu&)> _destructor;
+        memory_interface* _memory = nullptr;
 
     };
-
-    template<typename Allocator>
-    std::unique_ptr<cpu> cpu::create(const u64 memory_size) {
-        u32* memory = Allocator::allocate(memory_size);
-        if (memory == nullptr) {
-            return nullptr;
-        }
-
-        // ReSharper disable once CppSmartPointerVsMakeFunction - constructor is private
-        return std::unique_ptr<cpu>(new cpu(memory, memory_size, [](cpu& self) { Allocator::deallocate(self._memory); }));
-
-    }
 }

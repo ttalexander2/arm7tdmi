@@ -23,6 +23,29 @@ namespace arm7tdmi {
         ALLOCATION_ERROR,
     };
 
+
+    template <typename T, typename E = error, typename = std::enable_if_t<std::is_same_v<T, std::decay_t<T>>>>
+    class result {
+        union {
+            T _data;
+            E _error;
+        };
+        bool _valid;
+    public:
+        result() = delete;
+        // ReSharper disable once CppNonExplicitConvertingConstructor
+        result(T returnValue) : _data(returnValue), _valid(true) {} // NOLINT(*-explicit-constructor)
+        // ReSharper disable once CppNonExplicitConvertingConstructor
+        result(E errorValue) : _error(errorValue), _valid(false) {} // NOLINT(*-explicit-constructor)
+
+        [[nodiscard]] bool valid() const { return _valid; }
+
+        [[nodiscard]] T value() const { return std::move(_data); }
+        [[nodiscard]] E error() const { return std::move(_error); }
+
+        T* operator->() const { return &_data; }
+    };
+
     const char * error_to_string(error instr);
 
 }

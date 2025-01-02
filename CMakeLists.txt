@@ -37,9 +37,10 @@ add_library(arm7tdmi STATIC
         include/arm7tdmi/cpu.h
         src/cpu.cpp
         include/arm7tdmi/register.h
-        include/arm7tdmi/memory_interface.h
-        src/memory_interface.cpp
+        include/arm7tdmi/memory.h
+        src/memory.cpp
         src/types.cpp
+        include/arm7tdmi/common.h
 )
 
 include_directories(include)
