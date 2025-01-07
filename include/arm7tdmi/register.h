@@ -34,11 +34,7 @@ namespace arm7tdmi {
     static constexpr u32 CPSR_I = 7u;
     static constexpr u32 CPSR_F = 6u;
     static constexpr u32 CPSR_T = 5u;
-    static constexpr u32 CPSR_M4 = 4u;
-    static constexpr u32 CPSR_M3 = 3u;
-    static constexpr u32 CPSR_M2 = 2u;
-    static constexpr u32 CPSR_M1 = 1u;
-    static constexpr u32 CPSR_M0 = 0u;
+    static constexpr u32 CPSR_M = 0x1f;
 
     class cpsr_register : public cpu_register {
         friend struct fmt::formatter<cpu_register>;
@@ -52,7 +48,7 @@ namespace arm7tdmi {
         [[nodiscard]] inline bool get_i() const { return this->get_bit(CPSR_I); }
         [[nodiscard]] inline bool get_f() const { return this->get_bit(CPSR_F); }
         [[nodiscard]] inline bool get_t() const { return this->get_bit(CPSR_T); }
-        [[nodiscard]] inline u32 get_m() const { return data & 0x1F; }
+        [[nodiscard]] inline u32 get_m() const { return data & CPSR_M; }
 
         inline void set_n(const bool value) { this->set_bit(CPSR_N, value); }
         inline void set_z(const bool value) { this->set_bit(CPSR_Z, value); }
@@ -62,7 +58,7 @@ namespace arm7tdmi {
         inline void set_i(const bool value) { this->set_bit(CPSR_I, value); }
         inline void set_f(const bool value) { this->set_bit(CPSR_F, value); }
         inline void set_t(const bool value) { this->set_bit(CPSR_T, value); }
-        inline void set_m(const u32 mode) { data = (data & ~0x1F) | (mode & 0x1F); }
+        inline void set_m(const u32 mode) { data = (data & ~CPSR_M) | (mode & CPSR_M); }
 
         [[nodiscard]] inline cpu_mode get_mode() const { return static_cast<cpu_mode>(get_m()); }
         void set_mode(cpu_mode mode) { set_m(static_cast<u32>(mode)); }
