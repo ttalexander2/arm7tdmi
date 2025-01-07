@@ -2,13 +2,16 @@
 // Created by talexander on 9/9/2024.
 //
 #include <cassert>
+#include <io.h>
 #include <utility>
 #include <arm7tdmi/cpu.h>
 #include <arm7tdmi/memory.h>
 
 namespace arm7tdmi {
-    cpu::cpu(memory_interface* memory) : _memory(memory) {
 
+    cpu::cpu(memory_interface* memory) :
+        _memory(memory)
+    {
     }
 
     cpu::~cpu() {}
@@ -71,9 +74,9 @@ namespace arm7tdmi {
             // TODO(Thomas): assert register should be 0-14
         }
 
-        const cpu_mode exchange_mode = (register_data[rn] & 1u) == 1u ? cpu_mode::thumb : cpu_mode::arm;
+        const cpu_state exchange_mode = (register_data[rn] & 1u) == 1u ? cpu_state::thumb : cpu_state::arm;
 
-        if (_mode == cpu_mode::arm && exchange_mode == cpu_mode::thumb)
+        if (_state == cpu_state::arm && exchange_mode == cpu_state::thumb)
         {
             registers.pc = register_data[rn] - 1u; // set bit 0 to 1, use Rn - 1
         }
@@ -83,7 +86,7 @@ namespace arm7tdmi {
         }
 
         // if bit 0 of RN == 1 subsequent instructions are THUMB, else ARM
-        _mode = exchange_mode;
+        _state = exchange_mode;
     }
 
     void cpu::execute_arm_block_data_transfer(const u32 instr) {
@@ -93,24 +96,72 @@ namespace arm7tdmi {
         u8 register_list [16] = {};
         u8 register_list_n = 0;
 
+        bool r15_in_list = false;
+
         for (u32 i = 0; i < 16; ++i) {
             if (util::bit_check(instr, i)) {
                 register_list[register_list_n] = i;
                 register_list_n++;
+
+                if (i == 15) r15_in_list = true;
             }
         }
 
         u8 base_register = (instr >> 16) & 0xf;
+        u32 base_addr = register_data[base_register];
         bool load_store = util::bit_check(instr, 20u);
         bool write_back = util::bit_check(instr, 21u);
         bool psr_and_force_user = util::bit_check(instr, 22u);
-        bool up_down = util::bit_check(instr, 23u);
-        bool pre_post_indexing = util::bit_check(instr, 24u);
+        bool up = util::bit_check(instr, 23u);
+        bool pre_indexing = util::bit_check(instr, 24u);
 
-        if (_memory && registers.sp + 1u < _memory->get_size(cpu_mode::arm))
-        {
-            _memory->write_arm(registers.sp++, 0);
+        u32 offset = register_list_n * sizeof(u32); // Number of registers * word (size of register)
+
+        bool bank_transfer = psr_and_force_user;
+
+        // Add/subtract offset to base address (pre-indexing)
+        if (pre_indexing) {
+            base_addr += up ? offset : -offset;
         }
+
+        // Store in memory
+        if (load_store == 0u) {
+            if (_memory && base_addr + (register_list_n) * sizeof(u32) < _memory->size()) {
+                for (int i = 0; i < register_list_n; ++i) {
+                    _memory->write<u32>(base_addr + (i * sizeof(u32)), register_data[register_list[i]]);
+                }
+            }
+        }
+        // Load from memory
+        else {
+            if (_memory && base_addr + (sizeof(u32)) < _memory->size()) {
+                for (int i = 0; i < register_list_n; ++i) {
+                    register_data[register_list[i]] = _memory->read<u32>(base_addr);
+                    if (register_list[i] == 15 && psr_and_force_user && r15_in_list) {
+                        bank_transfer = false;
+                        const auto mode = registers.cpsr.get_mode();
+                        if (mode == cpu_mode::user || mode == cpu_mode::supervisor) {
+                            bank_transfer = true;
+                            continue;
+                        }
+                        registers.subset(mode).cpsr = registers.subset(mode).spsr;
+                    }
+                }
+            }
+        }
+
+        // Add/subtract offset to base address (post-indexing)
+        if (!pre_indexing) {
+            base_addr += up ? offset : -offset;
+        }
+
+        // Write back address to base register
+        if (write_back) {
+            register_data[base_register] = base_addr;
+        }
+
+
+
 
 
     }

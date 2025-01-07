@@ -8,9 +8,23 @@
 
 namespace arm7tdmi {
 
-    enum class cpu_mode : u8 {
-        arm,
-        thumb
+    enum class cpu_state : u8 {
+        arm = 0,
+        thumb = 1
+    };
+
+    enum class cpu_mode : u32 {
+        old_user       = 0x00,   // Old User Mode (backward compatibility)
+        old_fiq        = 0x01,   // Old FIQ Mode
+        old_irq        = 0x02,   // Old IRQ Mode
+        old_supervisor = 0x03,   // Old Supervisor Mode
+        user           = 0x10,   // User Mode (non-privileged)
+        fiq            = 0x11,   // FIQ Mode
+        irq            = 0x12,   // IRQ Mode
+        supervisor     = 0x13,   // Supervisor Mode (SWI)
+        abort          = 0x17,   // Abort Mode
+        undefined      = 0x1B,   // Undefined Mode
+        system         = 0x1F    // System Mode (privileged 'User' mode)
     };
 
     enum class condition_code : u8

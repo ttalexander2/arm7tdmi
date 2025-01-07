@@ -9,7 +9,6 @@
 #include <fmt/format.h>
 
 namespace arm7tdmi {
-
     class cpu_register {
         friend struct fmt::formatter<cpu_register>;
     protected:
@@ -53,11 +52,7 @@ namespace arm7tdmi {
         [[nodiscard]] inline bool get_i() const { return this->get_bit(CPSR_I); }
         [[nodiscard]] inline bool get_f() const { return this->get_bit(CPSR_F); }
         [[nodiscard]] inline bool get_t() const { return this->get_bit(CPSR_T); }
-        [[nodiscard]] inline bool get_m4() const { return this->get_bit(CPSR_M4); }
-        [[nodiscard]] inline bool get_m3() const { return this->get_bit(CPSR_M3); }
-        [[nodiscard]] inline bool get_m2() const { return this->get_bit(CPSR_M2); }
-        [[nodiscard]] inline bool get_m1() const { return this->get_bit(CPSR_M1); }
-        [[nodiscard]] inline bool get_m0() const { return this->get_bit(CPSR_M0); }
+        [[nodiscard]] inline u32 get_m() const { return data & 0x1F; }
 
         inline void set_n(const bool value) { this->set_bit(CPSR_N, value); }
         inline void set_z(const bool value) { this->set_bit(CPSR_Z, value); }
@@ -67,11 +62,10 @@ namespace arm7tdmi {
         inline void set_i(const bool value) { this->set_bit(CPSR_I, value); }
         inline void set_f(const bool value) { this->set_bit(CPSR_F, value); }
         inline void set_t(const bool value) { this->set_bit(CPSR_T, value); }
-        inline void set_m4(const bool value) { this->set_bit(CPSR_M4, value); }
-        inline void set_m3(const bool value) { this->set_bit(CPSR_M3, value); }
-        inline void set_m2(const bool value) { this->set_bit(CPSR_M2, value); }
-        inline void set_m1(const bool value) { this->set_bit(CPSR_M1, value); }
-        inline void set_m0(const bool value) { this->set_bit(CPSR_M0, value); }
+        inline void set_m(const u32 mode) { data = (data & ~0x1F) | (mode & 0x1F); }
+
+        [[nodiscard]] inline cpu_mode get_mode() const { return static_cast<cpu_mode>(get_m()); }
+        void set_mode(cpu_mode mode) { set_m(static_cast<u32>(mode)); }
 
         // ReSharper disable once CppNonExplicitConversionOperator
         inline operator u32&() { return data;} // NOLINT(*-explicit-constructor)
@@ -79,7 +73,34 @@ namespace arm7tdmi {
         inline cpsr_register &operator=(const u32 value) { data = value; return *this; }
     };
 
+    struct cpu_register_subset {
+        cpu_register& r0;
+        cpu_register& r1;
+        cpu_register& r2;
+        cpu_register& r3;
+        cpu_register& r4;
+        cpu_register& r5;
+        cpu_register& r6;
+        cpu_register& r7;
+        cpu_register& r8;
+        cpu_register& r9;
+        cpu_register& r10;
+        cpu_register& r11;
+        cpu_register& r12;
+        cpu_register& r13;
+        cpu_register& r14;
+        cpu_register& r15;
+        cpsr_register& cpsr;
+        cpu_register& spsr;
+
+        [[nodiscard]] cpu_register& operator[](size_t index) const;
+
+    };
+
     struct cpu_register_set {
+
+        cpu_register_set();
+
         cpu_register r0;
         cpu_register r1;
         cpu_register r2;
@@ -95,24 +116,58 @@ namespace arm7tdmi {
         cpu_register r12;
 
         union {
-            cpu_register r13;
+            cpu_register r13{};
             cpu_register sp;
         };
 
         union {
-            cpu_register r14;
+            cpu_register r14{};
             cpu_register lr;
         };
 
         union {
-            cpu_register r15;
+            cpu_register r15{};
             cpu_register pc;
         };
 
+        cpu_register r8_fiq;
+        cpu_register r9_fiq;
+        cpu_register r10_fiq;
+        cpu_register r11_fiq;
+        cpu_register r12_fiq;
+        cpu_register r13_fiq;
+        cpu_register r14_fiq;
+
+        cpu_register r13_svc;
+        cpu_register r14_svc;
+        cpu_register r13_abt;
+        cpu_register r14_abt;
+        cpu_register r13_irq;
+        cpu_register r14_irq;
+        cpu_register r13_und;
+        cpu_register r14_und;
+
         cpsr_register cpsr;
-        cpu_register spsr;
+
+        cpu_register spsr_fiq;
+        cpu_register spsr_svc;
+        cpu_register spsr_abt;
+        cpu_register spsr_irq;
+        cpu_register spsr_und;
+
+        [[nodiscard]] const cpu_register_subset& subset(cpu_mode mode) const;
+
+    private:
+        cpu_register_subset user_subset;
+        cpu_register_subset fiq_subset;
+        cpu_register_subset irq_subset;
+        cpu_register_subset supervisor_subset;
+        cpu_register_subset abort_subset;
+        cpu_register_subset undefined_subset;
+        cpu_register_subset system_subset;
     };
 }
+
 
 template <>
 struct fmt::formatter<arm7tdmi::cpu_register> : formatter<u32> {

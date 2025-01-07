@@ -86,7 +86,7 @@ TEST_CASE("arm_instruction_branch_and_exchange", "[arm instructions]")
         const u32 b = data[cpu.registers.pc / sizeof(u32)];
         cpu.execute_arm_branch_and_exchange(b);
         REQUIRE(cpu.registers.pc == 0x8010);
-        REQUIRE(cpu.get_mode() == arm7tdmi::cpu_mode::thumb);
+        REQUIRE(cpu.get_state() == arm7tdmi::cpu_state::thumb);
     }
     {
         arm7tdmi::memory_interface* memory = new arm7tdmi::basic_memory(60);
@@ -99,7 +99,7 @@ TEST_CASE("arm_instruction_branch_and_exchange", "[arm instructions]")
         const u32 b = data[cpu.registers.pc / sizeof(u32)];
         cpu.execute_arm_branch_and_exchange(b);
         REQUIRE(cpu.registers.pc == 0x8014);
-        REQUIRE(cpu.get_mode() == arm7tdmi::cpu_mode::arm);
+        REQUIRE(cpu.get_state() == arm7tdmi::cpu_state::arm);
     }
 }
 

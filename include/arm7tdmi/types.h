@@ -18,7 +18,14 @@ typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
 
+
+
 namespace arm7tdmi {
+
+    typedef u8 byte;
+    typedef u16 halfword;
+    typedef u32 word;
+
     enum class error : u8 {
         ALLOCATION_ERROR,
     };

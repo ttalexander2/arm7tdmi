@@ -41,6 +41,7 @@ add_library(arm7tdmi STATIC
         src/memory.cpp
         src/types.cpp
         include/arm7tdmi/common.h
+        src/register.cpp
 )
 
 include_directories(include)

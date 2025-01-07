@@ -14,22 +14,17 @@ namespace arm7tdmi {
     class memory_interface;
 
     class cpu final {
-        template <typename R, typename E>
-        friend class expected;
-
-        friend class std::variant<cpu, error>;
-
     public:
 
         union {
-            u32 register_data[18] = {};
-            cpu_register_set registers;
+            u32 register_data[37];
+            cpu_register_set registers = {};
         };
 
         explicit cpu(memory_interface* memory);
         ~cpu();
 
-        [[nodiscard]] inline cpu_mode get_mode() const { return _mode; }
+        [[nodiscard]] inline cpu_state get_state() const { return _state; }
 
         void execute(arm::instruction instr, u32 opcode);
         void execute(thumb::instruction instr, u16 opcode);
@@ -74,7 +69,7 @@ namespace arm7tdmi {
         void execute_thumb_unknown(u16 instr);
 
     private:
-        cpu_mode _mode = cpu_mode::arm;
+        cpu_state _state = cpu_state::arm;
         memory_interface* _memory = nullptr;
 
     };
