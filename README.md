@@ -25,5 +25,5 @@ target_link_libraries(app PRIVATE arm7tdmi fmt::fmt)
 
 ### Resouces:
 - [ARM7TDMI Instruction Set](https://www.dwedit.org/files/ARM7TDMI.pdf)
-- [gbatek - Arm Cpu Overview]([https://mgba-emu.github.io/gbatek/](https://mgba-emu.github.io/gbatek/#armcpuoverview)
+- [gbatek - Arm Cpu Overview](https://mgba-emu.github.io/gbatek/#armcpuoverview)
 
