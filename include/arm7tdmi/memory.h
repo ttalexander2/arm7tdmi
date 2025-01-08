@@ -61,6 +61,7 @@ namespace arm7tdmi {
 
 	template <typename T>
 	T memory_interface::read(const u32 address) const {
+		static_assert(std::is_same_v<T, u8> || std::is_same_v<T, u16> || std::is_same_v<T, u32>, "memory value must be u8/byte, u16/halfword, or u32/word");
 		T value = 0;
 		for (size_t i = 0; i < sizeof(T); ++i) {
 			value |= static_cast<T>(read_byte(address + i)) << (i * 8);
@@ -70,6 +71,7 @@ namespace arm7tdmi {
 
 	template <typename T>
 	void memory_interface::write(const u32 address, T value) {
+		static_assert(std::is_same_v<T, u8> || std::is_same_v<T, u16> || std::is_same_v<T, u32>, "memory value must be u8/byte, u16/halfword, or u32/word");
 		for (size_t i = 0; i < sizeof(T); ++i) {
 			write_byte(address + i, static_cast<uint8_t>((value >> (i * 8)) & 0xFF));
 		}

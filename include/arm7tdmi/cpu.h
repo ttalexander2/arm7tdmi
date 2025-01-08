@@ -16,13 +16,10 @@ namespace arm7tdmi {
     class cpu final {
     public:
 
-        union {
-            u32 register_data[37];
-            cpu_register_set registers = {};
-        };
+        cpu_registers registers = {};
 
         explicit cpu(memory_interface* memory);
-        ~cpu();
+        ~cpu() = default;
 
         [[nodiscard]] inline cpu_state get_state() const { return _state; }
 

@@ -8,13 +8,8 @@
 #include <arm7tdmi/memory.h>
 
 namespace arm7tdmi {
-
-    cpu::cpu(memory_interface* memory) :
-        _memory(memory)
-    {
+    cpu::cpu(memory_interface *memory) : _memory(memory) {
     }
-
-    cpu::~cpu() {}
 
     void cpu::execute(const arm::instruction instr, const u32 opcode) {
         switch(instr) {
@@ -70,19 +65,17 @@ namespace arm7tdmi {
 
         // register number
         const u32 rn = instr & 0xf;
-        if (rn >= 15u) {
-            // TODO(Thomas): assert register should be 0-14
-        }
+        assert(rn < 15u);
 
-        const cpu_state exchange_mode = (register_data[rn] & 1u) == 1u ? cpu_state::thumb : cpu_state::arm;
+        const cpu_state exchange_mode = (registers.get(static_cast<Register>(rn)) & 1u) == 1u ? cpu_state::thumb : cpu_state::arm;
 
         if (_state == cpu_state::arm && exchange_mode == cpu_state::thumb)
         {
-            registers.pc = register_data[rn] - 1u; // set bit 0 to 1, use Rn - 1
+            registers.pc(registers.get(rn) - 1u); // set bit 0 to 1, use Rn - 1
         }
         else
         {
-            registers.pc = register_data[rn]; // Either in same mode, or switching to arm, use Rn
+            registers.pc(registers.get(rn)); // Either in same mode, or switching to arm, use Rn
         }
 
         // if bit 0 of RN == 1 subsequent instructions are THUMB, else ARM
@@ -107,15 +100,15 @@ namespace arm7tdmi {
             }
         }
 
-        u8 base_register = (instr >> 16) & 0xf;
-        u32 base_addr = register_data[base_register];
-        bool load_store = util::bit_check(instr, 20u);
-        bool write_back = util::bit_check(instr, 21u);
-        bool psr_and_force_user = util::bit_check(instr, 22u);
-        bool up = util::bit_check(instr, 23u);
-        bool pre_indexing = util::bit_check(instr, 24u);
+        const u8 base_register = (instr >> 16) & 0xf;
+        u32 base_addr = registers.get(base_register);
+        const bool load_store = util::bit_check(instr, 20u);
+        const bool write_back = util::bit_check(instr, 21u);
+        const bool psr_and_force_user = util::bit_check(instr, 22u);
+        const bool up = util::bit_check(instr, 23u);
+        const bool pre_indexing = util::bit_check(instr, 24u);
 
-        u32 offset = register_list_n * sizeof(u32); // Number of registers * word (size of register)
+        const u32 offset = register_list_n * sizeof(u32); // Number of registers * word (size of register)
 
         bool bank_transfer = psr_and_force_user;
 
@@ -124,11 +117,17 @@ namespace arm7tdmi {
             base_addr += up ? offset : -offset;
         }
 
+        const auto mode = registers.cpsr_get_mode();
+        // if user bank transfer, we'll temporarily set the mode to user
+        if (!(psr_and_force_user && r15_in_list)) {
+            registers.cpsr_set_mode(cpu_mode::user);
+        }
+
         // Store in memory
         if (load_store == 0u) {
             if (_memory && base_addr + (register_list_n) * sizeof(u32) < _memory->size()) {
                 for (int i = 0; i < register_list_n; ++i) {
-                    _memory->write<u32>(base_addr + (i * sizeof(u32)), register_data[register_list[i]]);
+                    _memory->write<u32>(base_addr + (i * sizeof(u32)), registers.get(register_list[i]));
                 }
             }
         }
@@ -136,18 +135,17 @@ namespace arm7tdmi {
         else {
             if (_memory && base_addr + (sizeof(u32)) < _memory->size()) {
                 for (int i = 0; i < register_list_n; ++i) {
-                    register_data[register_list[i]] = _memory->read<u32>(base_addr);
-                    if (register_list[i] == 15 && psr_and_force_user && r15_in_list) {
-                        bank_transfer = false;
-                        const auto mode = registers.cpsr.get_mode();
-                        if (mode == cpu_mode::user || mode == cpu_mode::supervisor) {
-                            bank_transfer = true;
-                            continue;
-                        }
-                        registers.subset(mode).cpsr = registers.subset(mode).spsr;
-                    }
+                    registers.set(register_list[i], _memory->read<u32>(base_addr));
                 }
             }
+        }
+
+        if (psr_and_force_user && r15_in_list) {
+            // Instruction is LDM and R15 in list, mode changes
+            registers.cpsr(registers.spsr());
+        } else {
+            // Restore mode to previous (user bank transfer)
+            registers.cpsr_set_mode(mode);
         }
 
         // Add/subtract offset to base address (post-indexing)
@@ -157,12 +155,8 @@ namespace arm7tdmi {
 
         // Write back address to base register
         if (write_back) {
-            register_data[base_register] = base_addr;
+            registers.set(base_register, base_addr);
         }
-
-
-
-
 
     }
 
@@ -174,12 +168,12 @@ namespace arm7tdmi {
         const u32 opcode = util::bit_check(instr, 24);
 
         const i32 offset = util::twos_compliment(instr, 24);
-        const u32 calling_pc = registers.pc;
-        registers.pc = calling_pc + 8u + offset * 4u;
+        const u32 calling_pc = registers.pc();
+        registers.pc(calling_pc + 8u + offset * 4u);
 
         if (opcode == 1u) // branch with link - return address in REG_LR
         {
-            registers.lr = calling_pc + 4u;
+            registers.lr(calling_pc + 4u);
         }
     }
 
@@ -223,10 +217,10 @@ namespace arm7tdmi {
 
         u32 cond = (instr >> 28) & 0xf;
 
-        const u8 N = registers.cpsr.get_n();
-        const u8 Z = registers.cpsr.get_z();
-        const u8 C = registers.cpsr.get_c();
-        const u8 V = registers.cpsr.get_v();
+        const u8 N = registers.cpsr_get_n();
+        const u8 Z = registers.cpsr_get_z();
+        const u8 C = registers.cpsr_get_c();
+        const u8 V = registers.cpsr_get_v();
 
         switch(static_cast<condition_code>(cond))
         {
