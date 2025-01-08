@@ -127,7 +127,9 @@ namespace arm7tdmi {
         if (load_store == 0u) {
             if (_memory && base_addr + (register_list_n) * sizeof(u32) < _memory->size()) {
                 for (int i = 0; i < register_list_n; ++i) {
-                    _memory->write<u32>(base_addr + (i * sizeof(u32)), registers.get(register_list[i]));
+                    if (!_memory->write<u32>(base_addr + (i * sizeof(u32)), registers.get(register_list[i]))) {
+                        // TODO(Thomas): Address invalid, raise data abort signal
+                    }
                 }
             }
         }
@@ -135,7 +137,14 @@ namespace arm7tdmi {
         else {
             if (_memory && base_addr + (sizeof(u32)) < _memory->size()) {
                 for (int i = 0; i < register_list_n; ++i) {
-                    registers.set(register_list[i], _memory->read<u32>(base_addr));
+                    u32 result = 0;
+                    if (_memory->read<u32>(base_addr, &result)) {
+                        registers.set(register_list[i], result);
+                    }
+                    else {
+                        // TODO(Thomas): Address invalid, raise data abort signal
+                    }
+
                 }
             }
         }

@@ -17,17 +17,19 @@ namespace arm7tdmi {
         return _size;
     }
 
-    u8 basic_memory::read_byte(const u32 address) const {
+    bool basic_memory::read_byte(const u32 address, u8* out) const {
         if (address >= _size) {
-            return 0;
+            return false;
         }
-        return _memory[address];
+        *out = _memory[address];
+        return true;
     }
 
-    void basic_memory::write_byte(const size_t address, const u8 value) {
+    bool basic_memory::write_byte(const size_t address, const u8 value) {
         if (address >= _size) {
-            return;
+            return false;
         }
         _memory[address] = value;
+        return true;
     }
 }
