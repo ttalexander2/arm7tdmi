@@ -104,15 +104,25 @@ TEST_CASE("arm_instruction_branch_and_exchange", "[arm instructions]")
 
 TEST_CASE("arm_instruction_block_data_transfer", "[arm instructions]")
 {
-    const auto data = read_binary_from_file<u32>("assembly/arm/instructions/test_branch.s.bin");
+    const auto data = read_binary_from_file<u32>("assembly/arm/instructions/test_block_data_transfer.s.bin");
     auto memory = arm7tdmi::basic_memory(256);
     auto cpu = arm7tdmi::cpu(&memory);
     {
         cpu.registers.cpsr_set_mode(arm7tdmi::cpu_mode::supervisor);
+        // write 3 values to the stack
+        memory.write<u32>(0x0, 33);
+        memory.write<u32>(0x1, 44);
+        memory.write<u32>(0x2, 55);
+        cpu.registers.sp(0x0);
         cpu.registers.pc(0x8000);
         const u32 b = data[cpu.registers.pc() / sizeof(u32)];
+        auto instr = arm7tdmi::arm::decode(b);
+        REQUIRE(instr == arm7tdmi::arm::instruction::block_data_transfer);
+        fmt::println("{:b}", b);
         cpu.execute_arm_block_data_transfer(b);
-        REQUIRE(cpu.registers.pc() == 0X8014);
+        REQUIRE(cpu.registers.r0() == 33);
+        REQUIRE(cpu.registers.r1() == 44);
+        REQUIRE(cpu.registers.r2() == 55);
     }
 }
 

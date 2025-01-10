@@ -24,9 +24,10 @@ namespace arm7tdmi {
          * 
          * @tparam T Type to read. Must be u8/byte, u16/halfword, or u32/word.
          * @param address 32-bit memory address.
+         * @param out Pointer to set result.
          * @return Value stored the address.
          */
-        template <typename T, AlignmentType Alignment = AlignmentType::Force>
+        template <typename T = u32, AlignmentType Alignment = AlignmentType::Force>
     	bool read(u32 address, T* out) const;
 
         /**
@@ -35,7 +36,7 @@ namespace arm7tdmi {
          * @param address 32-bit memory address.
          * @param value Value to write to memory at the address.
          */
-        template <typename T, AlignmentType Alignment = AlignmentType::Force>
+        template <typename T = u32, AlignmentType Alignment = AlignmentType::Force>
     	bool write(u32 address, T value);
 
         /**

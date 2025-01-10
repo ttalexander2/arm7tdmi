@@ -23,7 +23,7 @@ target_link_libraries(app PRIVATE arm7tdmi fmt::fmt)
 - Additionally, `ARM_ASSEMBLER_PATH` must be passed to cmake, in order to build and test with real ARM assembly. This expects a path to the `bin` folder of the ARM GNU Toolchain.
 - Requires [Version 10.3-2021.10](https://developer.arm.com/downloads/-/gnu-rm/10-3-2021-10) of the ARM GNU Toolchain. Later versions have been found to not support `-march=armv4t`, required to build executables for this architecture.
 
-### Resouces:
+### Resources:
 - [ARM7TDMI Instruction Set](https://www.dwedit.org/files/ARM7TDMI.pdf)
 - [gbatek - Arm Cpu Overview](https://mgba-emu.github.io/gbatek/#armcpuoverview)
 

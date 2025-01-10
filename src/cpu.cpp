@@ -2,7 +2,6 @@
 // Created by talexander on 9/9/2024.
 //
 #include <cassert>
-#include <io.h>
 #include <utility>
 #include <arm7tdmi/cpu.h>
 #include <arm7tdmi/memory.h>
@@ -124,7 +123,7 @@ namespace arm7tdmi {
         }
 
         // Store in memory
-        if (load_store == 0u) {
+        if (load_store == false) {
             if (_memory && base_addr + (register_list_n) * sizeof(u32) < _memory->size()) {
                 for (int i = 0; i < register_list_n; ++i) {
                     if (!_memory->write<u32>(base_addr + (i * sizeof(u32)), registers.get(register_list[i]))) {
