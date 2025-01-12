@@ -10,6 +10,8 @@ string(TOLOWER "${OUTPUT_DIR}" OUTPUT_DIR)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin/${OUTPUT_DIR}")
 
+include(FetchContent)
+
 FetchContent_Declare(
         catch
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git

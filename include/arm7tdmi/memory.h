@@ -114,14 +114,15 @@ namespace arm7tdmi {
 		u32 aligned_address = address;
 		u32 rotation = 0;
 
+        // TODO(Thomas): I'm not sure this alignment works or not
 		if constexpr (Alignment == AlignmentType::Force) {
 			// Force alignment by rounding down the address
-			aligned_address = address & ~3;  // Mask lower 2 bits to align to 4-byte boundary
+			aligned_address = address & ~0x3;  // Mask lower 2 bits to align to 4-byte boundary
 		}
 		else if constexpr (Alignment == AlignmentType::Rotate) {
 			// Calculate rotation based on misalignment
-			rotation = (address & 3) * 8;  // Rotation in bits based on misalignment
-			aligned_address = address & ~3;  // Mask lower 2 bits to align to 4-byte boundary
+			rotation = (address & 0x3) * 8;  // Rotation in bits based on misalignment
+			aligned_address = address & ~0x3;  // Mask lower 2 bits to align to 4-byte boundary
 		}
 
 		bool success = true;

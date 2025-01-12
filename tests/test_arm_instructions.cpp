@@ -108,21 +108,76 @@ TEST_CASE("arm_instruction_block_data_transfer", "[arm instructions]")
     auto memory = arm7tdmi::basic_memory(256);
     auto cpu = arm7tdmi::cpu(&memory);
     {
-        cpu.registers.cpsr_set_mode(arm7tdmi::cpu_mode::supervisor);
-        // write 3 values to the stack
-        memory.write<u32>(0x0, 33);
-        memory.write<u32>(0x1, 44);
-        memory.write<u32>(0x2, 55);
-        cpu.registers.sp(0x0);
-        cpu.registers.pc(0x8000);
-        const u32 b = data[cpu.registers.pc() / sizeof(u32)];
-        auto instr = arm7tdmi::arm::decode(b);
-        REQUIRE(instr == arm7tdmi::arm::instruction::block_data_transfer);
-        fmt::println("{:b}", b);
-        cpu.execute_arm_block_data_transfer(b);
-        REQUIRE(cpu.registers.r0() == 33);
-        REQUIRE(cpu.registers.r1() == 44);
-        REQUIRE(cpu.registers.r2() == 55);
+
+        {
+            cpu.registers.cpsr_set_mode(arm7tdmi::cpu_mode::user);
+
+            // write 3 values to the stack
+            memory.write<u32>(0x0000, 0);
+            memory.write<u32>(0x0004, 1);
+            memory.write<u32>(0x0008, 2);
+
+            for (int i = 0; i < 13; ++i)
+            {
+                cpu.registers.set(i, i * 5);
+            }
+
+            cpu.registers.sp(0x0000);
+            cpu.registers.lr(0x0000);
+            cpu.registers.pc(0x8000);
+        }
+
+        // LDMFD SP!,{R0,R1,R2}        @ Unstack 3 registers.
+        {
+            const u32 b = data[cpu.registers.pc() / sizeof(u32)];
+            auto instr = arm7tdmi::arm::decode(b);
+
+            REQUIRE(instr == arm7tdmi::arm::instruction::block_data_transfer);
+            cpu.execute(instr, b);
+
+            REQUIRE(cpu.registers.r0() == 0);
+            REQUIRE(cpu.registers.r1() == 1);
+            REQUIRE(cpu.registers.r2() == 2);
+            REQUIRE(cpu.registers.sp() == 0x000C);
+        }
+
+        // STMIA R0,{R0-R15}           @ Save all registers.
+        {
+            const u32 b = data[(cpu.registers.pc() + sizeof(u32)) / sizeof(u32)];
+            auto instr = arm7tdmi::arm::decode(b);
+
+            REQUIRE(instr == arm7tdmi::arm::instruction::block_data_transfer);
+            cpu.execute(instr, b);
+
+            u32 val = 0;
+            u32 base_addr = 0x0000;
+
+            // Registers 0 - 2 should have the values loaded read from memory from the previous instruction
+            for (int i = 0; i < 3; ++i)
+            {
+                REQUIRE(memory.read<u32>(base_addr + i * sizeof(u32), &val));
+                REQUIRE(val == i);
+            }
+
+            // Registers 3 - 12 should have the original data stored (multiples of 5)
+            for (int i = 4; i < 13; ++i) {
+                REQUIRE(memory.read<u32>(base_addr + i * sizeof(u32), &val));
+                REQUIRE(val == i * 5);
+            }
+
+            // Stack pointer shouldn't have changed???
+            REQUIRE(memory.read<u32>(base_addr + 13 * sizeof(u32), &val));
+            REQUIRE(val == 0x000C);
+
+            // No branch so far, so this should still be 0'd
+            REQUIRE(memory.read<u32>(base_addr + 14 * sizeof(u32), &val));
+            REQUIRE(val == 0x0000);
+
+            // We're manually loading instructions, so we're not incrementing PC at all
+            REQUIRE(memory.read<u32>(base_addr + 15 * sizeof(u32), &val));
+            REQUIRE(val == 0x8000);
+        }
+
     }
 }
 
