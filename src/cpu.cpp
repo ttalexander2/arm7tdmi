@@ -100,46 +100,46 @@ namespace arm7tdmi {
         }
 
         const u8 base_register = (instr >> 16) & 0xf;
-        u32 base_addr = registers.get(base_register);
         const bool load_store = util::bit_check(instr, 20u);
         const bool write_back = util::bit_check(instr, 21u);
-        const bool psr_and_force_user = util::bit_check(instr, 22u);
+        const bool psr = util::bit_check(instr, 22u);
         const bool up = util::bit_check(instr, 23u);
         const bool pre_indexing = util::bit_check(instr, 24u);
+
+        u32 base_addr = registers.get(base_register);
+        u32 write_back_addr = base_addr + ((up ? 1 : -1) * sizeof(u32) * register_list_n);
 
         const u32 offset = register_list_n * sizeof(u32); // Number of registers * word (size of register)
 
 
-        // Add/subtract offset to base address (pre-indexing)
-        if (pre_indexing) {
-            base_addr += up ? offset : -offset;
-        }
-
         const auto mode = registers.cpsr_get_mode();
         // if user bank transfer, we'll temporarily set the mode to user
-        if (!(psr_and_force_user && r15_in_list)) {
+        if (!(psr && r15_in_list)) {
             registers.cpsr_set_mode(cpu_mode::user);
         }
+
+        u32 addr = base_addr + ((up ? 1 : -1)) * (psr ? sizeof(u32) : 0) - (up ? 0 : (register_list_n - 1) * sizeof(u32));
 
         // Store in memory
         if (!load_store) {
             if (_memory && base_addr + (register_list_n) * sizeof(u32) < _memory->size()) {
                 for (int i = 0; i < register_list_n; ++i) {
-                    u32 addr = base_addr + (i * sizeof(u32));
                     if (!_memory->write<u32>(addr, registers.get(register_list[i]))) {
                         // TODO(Thomas): Address invalid, raise data abort signal
                     }
+                    addr += sizeof(u32);
                 }
             } else {
                 // TODO(Thomas): Memory error!
                 __debugbreak();
+                return;
             }
         }
         // Load from memory
         else {
             if (_memory && base_addr + (sizeof(u32)) < _memory->size()) {
                 for (int i = 0; i < register_list_n; ++i) {
-                    u32 addr = base_addr + (i * sizeof(u32));
+
                     u32 result = 0;
                     if (_memory->read<u32>(addr, &result)) {
                         registers.set(register_list[i], result);
@@ -147,25 +147,21 @@ namespace arm7tdmi {
                     else {
                         // TODO(Thomas): Address invalid, raise data abort signal
                     }
-
+                    addr += sizeof(u32);
                 }
             } else {
                 // TODO(Thomas): Memory error!
                 __debugbreak();
+                return;
             }
         }
 
-        if (psr_and_force_user && r15_in_list) {
+        if (psr && r15_in_list) {
             // Instruction is LDM and R15 in list, mode changes
             registers.cpsr(registers.spsr());
         } else {
             // Restore mode to previous (user bank transfer)
             registers.cpsr_set_mode(mode);
-        }
-
-        // Add/subtract offset to base address (post-indexing)
-        if (!pre_indexing) {
-            base_addr += up ? offset : -offset;
         }
 
         // Write back address to base register
