@@ -105,7 +105,7 @@ TEST_CASE("arm_instruction_branch_and_exchange", "[arm instructions]")
 TEST_CASE("arm_instruction_block_data_transfer", "[arm instructions]")
 {
     const auto data = read_binary_from_file<u32>("assembly/arm/instructions/test_block_data_transfer.s.bin");
-    auto memory = arm7tdmi::basic_memory(256);
+    auto memory = arm7tdmi::basic_memory(4096);
     auto cpu = arm7tdmi::cpu(&memory);
     {
 
@@ -176,6 +176,86 @@ TEST_CASE("arm_instruction_block_data_transfer", "[arm instructions]")
             // We're manually loading instructions, so we're not incrementing PC at all
             REQUIRE(memory.read<u32>(base_addr + 15 * sizeof(u32), &val));
             REQUIRE(val == 0x8000);
+        }
+
+        // LDMFD SP!,{R15}             @ R15 <- (SP),CPSR unchanged.
+        {
+            cpu.registers.pc(0x8000);
+            const u32 b = data[(cpu.registers.pc() + (sizeof(u32) * 2)) / sizeof(u32)];
+            auto instr = arm7tdmi::arm::decode(b);
+
+            u32 stack_ptr;
+            memory.read<u32>(cpu.registers.sp(), &stack_ptr);
+            u32 addr = cpu.registers.sp();
+
+            REQUIRE(instr == arm7tdmi::arm::instruction::block_data_transfer);
+            cpu.execute(instr, b);
+
+            // Stack pointer should be stored in r15
+            REQUIRE(cpu.registers.r15() == stack_ptr);
+
+            // FD -> Full stack, descending
+            // "SP is decremented when pushing/storing data, and incremented when popping/loading data"
+            REQUIRE(cpu.registers.sp() == addr + sizeof(u32));
+        }
+
+
+        // LDMFD SP!,{R15}^            @ R15 <- (SP), CPSR <- SPSR_mode
+        {
+            // Allowed only in privileged modes, so we'll set to supervisor
+            cpu.registers.cpsr_set_mode(arm7tdmi::cpu_mode::supervisor);
+
+            cpu.registers.pc(0x8000);
+            const u32 b = data[(cpu.registers.pc() + (sizeof(u32) * 3)) / sizeof(u32)];
+            auto instr = arm7tdmi::arm::decode(b);
+
+            u32 stack_ptr;
+            memory.read<u32>(cpu.registers.sp(), &stack_ptr);
+            u32 addr = cpu.registers.sp();
+            u32 spsr = cpu.registers.spsr();
+
+            REQUIRE(instr == arm7tdmi::arm::instruction::block_data_transfer);
+            cpu.execute(instr, b);
+
+            // Stack pointer should be stored in r15
+            REQUIRE(cpu.registers.r15() == stack_ptr);
+
+            // FD -> Full stack, descending
+            // "SP is decremented when pushing/storing data, and incremented when popping/loading data"
+            REQUIRE(cpu.registers.sp() == addr + sizeof(u32));
+
+            REQUIRE(cpu.registers.cpsr() == spsr);
+        }
+
+        // STMFD R13,{R0-R14}^         @ Save user mode regs on stack
+        {
+            // Allowed only in privileged modes, so we'll set to supervisor
+            cpu.registers.cpsr_set_mode(arm7tdmi::cpu_mode::supervisor);
+
+            cpu.registers.pc(0x8000);
+            const u32 b = data[(cpu.registers.pc() + (sizeof(u32) * 4)) / sizeof(u32)];
+            auto instr = arm7tdmi::arm::decode(b);
+
+            std::vector<u32> user_registers;
+            for (int i = 0; i < 15; ++i)
+            {
+                user_registers.push_back(cpu.registers.get(i));
+            }
+            cpu.registers.sp(0x128);
+            u32 old_sp = cpu.registers.sp();
+
+            REQUIRE(instr == arm7tdmi::arm::instruction::block_data_transfer);
+            cpu.execute(instr, b);
+
+            // Stack pointer should be stored in r15
+            for (int i = 0; i < 15; ++i)
+            {
+                u32 val;
+                memory.read<u32>(cpu.registers.sp() + i * sizeof(u32), &val);
+                REQUIRE(val == user_registers[i]);
+            }
+
+            REQUIRE(cpu.registers.r13() == old_sp);
         }
 
     }

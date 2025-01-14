@@ -109,7 +109,6 @@ namespace arm7tdmi {
 
         const u32 offset = register_list_n * sizeof(u32); // Number of registers * word (size of register)
 
-        bool bank_transfer = psr_and_force_user;
 
         // Add/subtract offset to base address (pre-indexing)
         if (pre_indexing) {
@@ -123,7 +122,7 @@ namespace arm7tdmi {
         }
 
         // Store in memory
-        if (load_store == false) {
+        if (!load_store) {
             if (_memory && base_addr + (register_list_n) * sizeof(u32) < _memory->size()) {
                 for (int i = 0; i < register_list_n; ++i) {
                     u32 addr = base_addr + (i * sizeof(u32));
@@ -131,6 +130,9 @@ namespace arm7tdmi {
                         // TODO(Thomas): Address invalid, raise data abort signal
                     }
                 }
+            } else {
+                // TODO(Thomas): Memory error!
+                __debugbreak();
             }
         }
         // Load from memory
@@ -147,6 +149,9 @@ namespace arm7tdmi {
                     }
 
                 }
+            } else {
+                // TODO(Thomas): Memory error!
+                __debugbreak();
             }
         }
 
