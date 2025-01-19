@@ -100,7 +100,7 @@ namespace arm7tdmi {
         }
 
         const u8 base_register = (instr >> 16) & 0xf;
-        const bool load_store = util::bit_check(instr, 20u);
+        const bool load = util::bit_check(instr, 20u);
         const bool write_back = util::bit_check(instr, 21u);
         const bool psr = util::bit_check(instr, 22u);
         const bool up = util::bit_check(instr, 23u);
@@ -109,7 +109,7 @@ namespace arm7tdmi {
         u32 base_addr = registers.get(base_register);
         u32 write_back_addr = base_addr + ((up ? 1 : -1) * sizeof(u32) * register_list_n);
 
-        const u32 offset = register_list_n * sizeof(u32); // Number of registers * word (size of register)
+        //const u32 offset = register_list_n * sizeof(u32); // Number of registers * word (size of register)
 
 
         const auto mode = registers.cpsr_get_mode();
@@ -118,43 +118,40 @@ namespace arm7tdmi {
             registers.cpsr_set_mode(cpu_mode::user);
         }
 
-        u32 addr = base_addr + ((up ? 1 : -1)) * (psr ? sizeof(u32) : 0) - (up ? 0 : (register_list_n - 1) * sizeof(u32));
+        //u32 addr = base_addr + (((up ? 1 : -1)) * (psr ? sizeof(u32) : 0)) - ((up ? 0 : (register_list_n - 1) * sizeof(u32)));
+        u32 addr = base_addr;
 
         // Store in memory
-        if (!load_store) {
-            if (_memory && base_addr + (register_list_n) * sizeof(u32) < _memory->size()) {
-                for (int i = 0; i < register_list_n; ++i) {
-                    if (!_memory->write<u32>(addr, registers.get(register_list[i]))) {
-                        // TODO(Thomas): Address invalid, raise data abort signal
-                    }
-                    addr += sizeof(u32);
-                }
-            } else {
-                // TODO(Thomas): Memory error!
-                __debugbreak();
-                return;
-            }
+        if (!_memory) {
+            // Something went very wrong
+            return;
         }
-        // Load from memory
-        else {
-            if (_memory && base_addr + (sizeof(u32)) < _memory->size()) {
-                for (int i = 0; i < register_list_n; ++i) {
 
-                    u32 result = 0;
-                    if (_memory->read<u32>(addr, &result)) {
-                        registers.set(register_list[i], result);
-                    }
-                    else {
-                        // TODO(Thomas): Address invalid, raise data abort signal
-                    }
-                    addr += sizeof(u32);
+        for (int i = 0; i < register_list_n; ++i) {
+            if (pre_indexing) {
+                addr += sizeof(u32);
+            }
+            if (load) {
+                u32 result;
+                if (_memory->read<u32>(addr, &result)) {
+                    registers.set(register_list[i], result);
                 }
-            } else {
-                // TODO(Thomas): Memory error!
-                __debugbreak();
-                return;
+                else {
+                    //TODO(Thomas): Address invalid, raise abort signal
+                    return;
+                }
+            }
+            else {
+                if (!_memory->write<u32>(addr, registers.get(register_list[i]))) {
+                    // TODO(Thomas): Address invalid, raise data abort signal
+                    return;
+                }
+            }
+            if (!pre_indexing) {
+                addr += sizeof(u32);
             }
         }
+
 
         if (psr && r15_in_list) {
             // Instruction is LDM and R15 in list, mode changes

@@ -236,6 +236,8 @@ TEST_CASE("arm_instruction_block_data_transfer", "[arm instructions]")
         auto instr = arm7tdmi::arm::decode(b);
 
         std::vector<u32> user_registers;
+        user_registers.reserve(15);
+
         for (int i = 0; i < 15; ++i)
         {
             user_registers.push_back(cpu.registers.get(i));
@@ -250,11 +252,14 @@ TEST_CASE("arm_instruction_block_data_transfer", "[arm instructions]")
         for (int i = 0; i < 15; ++i)
         {
             u32 val;
-            memory.read<u32>(cpu.registers.r13() + (i * sizeof(u32)), &val);
+            u32 stack_ptr = cpu.registers.sp();
+            memory.read<u32>(stack_ptr + ((i + 1) * sizeof(u32)), &val);
             REQUIRE(val == user_registers[i]);
         }
 
-        REQUIRE(cpu.registers.r13() == old_sp);
+        u32 val;
+        memory.read<u32>(cpu.registers.sp(), &val);
+        REQUIRE(val == old_sp);
     }
 }
 
