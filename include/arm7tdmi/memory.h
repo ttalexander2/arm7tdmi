@@ -18,7 +18,7 @@ namespace arm7tdmi {
 
     class memory_interface {
     public:
-        virtual ~memory_interface() = default;
+        virtual ~memory_interface() noexcept = default;
 
         /**
          * 
@@ -28,7 +28,7 @@ namespace arm7tdmi {
          * @return Value stored the address.
          */
         template <typename T = u32, AlignmentType Alignment = AlignmentType::Force>
-    	bool read(u32 address, T* out) const;
+    	bool read(u32 address, T* out) const noexcept;
 
         /**
          * 
@@ -37,29 +37,29 @@ namespace arm7tdmi {
          * @param value Value to write to memory at the address.
          */
         template <typename T = u32, AlignmentType Alignment = AlignmentType::Force>
-    	bool write(u32 address, T value);
+    	bool write(u32 address, T value) noexcept;
 
         /**
          * 
          * @return Returns total memory block size in bytes
          */
-        [[nodiscard]] virtual u64 size() const = 0;
+        [[nodiscard]] virtual u64 size() const noexcept = 0;
 
     protected:
-    	[[nodiscard]] virtual bool read_byte(u32 address, u8* out) const = 0;
-    	virtual bool write_byte(size_t address, u8 value) = 0;
+    	[[nodiscard]] virtual bool read_byte(u32 address, u8* out) const noexcept = 0;
+    	virtual bool write_byte(size_t address, u8 value) noexcept = 0;
     };
 
 	class basic_memory final : public memory_interface {
     public:
-		explicit basic_memory(u64 size);
-		~basic_memory() override;
+		explicit basic_memory(u64 size) noexcept;
+		~basic_memory() noexcept override;
 
-		[[nodiscard]] u32 size() const override;
+		[[nodiscard]] u32 size() const noexcept override;
 
 	protected:
-		[[nodiscard]] bool read_byte(u32 address, u8* out) const override;
-		bool write_byte(size_t address, u8 value) override;
+		[[nodiscard]] bool read_byte(u32 address, u8* out) const noexcept override;
+		bool write_byte(size_t address, u8 value) noexcept override;
 
 	private:
 		u8* _memory = nullptr;
@@ -67,7 +67,7 @@ namespace arm7tdmi {
     };
 
 	template <typename T, AlignmentType Alignment>
-	bool memory_interface::read(const u32 address, T* out) const {
+	bool memory_interface::read(const u32 address, T* out) const noexcept {
 		static_assert(std::is_same_v<T, u8> || std::is_same_v<T, u16> || std::is_same_v<T, u32>, "memory value must be u8/byte, u16/halfword, or u32/word");
 
 		if (out == nullptr) {
@@ -108,7 +108,7 @@ namespace arm7tdmi {
 	}
 
 	template <typename T, AlignmentType Alignment>
-	bool memory_interface::write(const u32 address, T value) {
+	bool memory_interface::write(const u32 address, T value) noexcept {
 		static_assert(std::is_same_v<T, u8> || std::is_same_v<T, u16> || std::is_same_v<T, u32>, "memory value must be u8/byte, u16/halfword, or u32/word");
 
 		u32 aligned_address = address;

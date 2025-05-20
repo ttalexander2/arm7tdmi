@@ -9,19 +9,19 @@ namespace arm7tdmi {
     namespace arm {
 
         namespace {
-            bool is_branch_and_exchange(const u32 opcode) {
+            bool is_branch_and_exchange(const u32 opcode) noexcept {
                 constexpr u32 format = 0x012fff10;
                 constexpr u32 mask = 0x0ffffff0;
                 return (opcode & mask) == format;
             }
 
-            bool is_block_data_transfer(const u32 opcode) {
+            bool is_block_data_transfer(const u32 opcode) noexcept {
                 constexpr u32 format = 0x08000000;
                 constexpr u32 mask = 0x0e000000;
                 return (opcode & mask) == format;
             }
 
-            bool is_branch(const u32 opcode) {
+            bool is_branch(const u32 opcode) noexcept {
                 constexpr u32 branch_format = 0x0a000000;
                 constexpr u32 link_format = 0x0b000000;
                 constexpr u32 mask = 0x0f000000;
@@ -29,74 +29,74 @@ namespace arm7tdmi {
                 return format == branch_format || format == link_format;
             }
 
-            bool is_software_interrupt(const u32 opcode) {
+            bool is_software_interrupt(const u32 opcode) noexcept {
                 constexpr u32 format = 0x0f000000;
                 constexpr u32 mask = 0x0f000000;
                 return (opcode & mask) == format;
             }
 
-            bool is_undefined(const u32 opcode) {
+            bool is_undefined(const u32 opcode) noexcept {
                 constexpr u32 format = 0x06000010;
                 constexpr u32 mask = 0x0e000010;
                 return (opcode & mask) == format;
             }
 
-            bool is_single_data_transfer(const u32 opcode) {
+            bool is_single_data_transfer(const u32 opcode) noexcept {
                 constexpr u32 format = 0x04000000;
                 constexpr u32 mask = 0x0c000000;
                 return (opcode & mask) == format;
             }
 
-            bool is_single_data_swap(const u32 opcode) {
+            bool is_single_data_swap(const u32 opcode) noexcept {
                 constexpr u32 format = 0x01000090;
                 constexpr u32 mask = 0x0f800ff0;
                 return (opcode & mask) == format;
             }
 
-            bool is_multiply(const u32 opcode) {
+            bool is_multiply(const u32 opcode) noexcept {
                 constexpr u32 format = 0x00000090;
                 constexpr u32 mask = 0x0f8000f0;
                 return (opcode & mask) == format;
             }
 
-            bool is_multiply_long(const u32 opcode) {
+            bool is_multiply_long(const u32 opcode) noexcept {
                 constexpr u32 format = 0x00800090;
                 constexpr u32 mask = 0x0f8000f0;
                 return (opcode & mask) == format;
             }
 
-            bool is_halfword_data_transfer_register(const u32 opcode) {
+            bool is_halfword_data_transfer_register(const u32 opcode) noexcept {
                 constexpr u32 format = 0x00000090;
                 constexpr u32 mask = 0x0e400f90;
                 return (opcode & mask) == format;
             }
 
-            bool is_halfword_data_transfer_immediate(const u32 opcode) {
+            bool is_halfword_data_transfer_immediate(const u32 opcode) noexcept {
                 constexpr u32 format = 0x00400090;
                 constexpr u32 mask = 0x0e400090;
                 return (opcode & mask) == format;
             }
 
-            bool is_psr_transfer_mrs(const u32 opcode) {
+            bool is_psr_transfer_mrs(const u32 opcode) noexcept {
                 constexpr u32 format = 0x010f0000;
                 constexpr u32 mask = 0x0fbf0000;
                 return (opcode & mask) == format;
             }
 
-            bool is_psr_transfer_msr(const u32 opcode) {
+            bool is_psr_transfer_msr(const u32 opcode) noexcept {
                 constexpr u32 format = 0x0120f000;
                 constexpr u32 mask = 0x0db0f000;
                 return (opcode & mask) == format;
             }
 
-            bool is_data_processing(const u32 opcode) {
+            bool is_data_processing(const u32 opcode) noexcept {
                 constexpr u32 format = 0x00000000;
                 constexpr u32 mask = 0x0c000000;
                 return (opcode & mask) == format;
             }
         }
 
-        instruction decode(const u32 opcode) {
+        instruction decode(const u32 opcode) noexcept {
             if (is_branch_and_exchange(opcode)) return instruction::branch_and_exchange;
             if (is_block_data_transfer(opcode)) return instruction::block_data_transfer;
             if (is_branch(opcode)) return instruction::branch;
@@ -115,7 +115,7 @@ namespace arm7tdmi {
         }
 
         
-        const char * instruction_to_string(const instruction instr) {
+        const char * instruction_to_string(const instruction instr) noexcept {
             switch(instr) {
                 case instruction::branch_and_exchange: return "branch_and_exchange";
                 case instruction::block_data_transfer: return "block_data_transfer";
@@ -140,115 +140,115 @@ namespace arm7tdmi {
 
         namespace {
             
-            bool is_software_interrupt(const u16 opcode) {
+            bool is_software_interrupt(const u16 opcode) noexcept {
                 constexpr u16 format = 0xdf00;
                 constexpr u16 mask = 0xff00;
                 return (opcode & mask) == format;
             }
 
-            bool is_unconditional_branch(const u16 opcode) {
+            bool is_unconditional_branch(const u16 opcode) noexcept {
                 constexpr u16 format = 0xe000;
                 constexpr u16 mask = 0xf800;
                 return (opcode & mask) == format;
             }
 
-            bool is_conditional_branch(const u16 opcode) {
+            bool is_conditional_branch(const u16 opcode) noexcept {
                 constexpr u16 format = 0xd000;
                 constexpr u16 mask = 0xf000;
                 return (opcode & mask) == format;
             }
 
-            bool is_multiple_load_store(const u16 opcode) {
+            bool is_multiple_load_store(const u16 opcode) noexcept {
                 constexpr u16 format = 0xc000;
                 constexpr u16 mask = 0xf000;
                 return (opcode & mask) == format;
             }
 
-            bool is_long_branch_with_link(const u16 opcode) {
+            bool is_long_branch_with_link(const u16 opcode) noexcept {
                 constexpr u16 format = 0xf000;
                 constexpr u16 mask = 0xf000;
                 return (opcode & mask) == format;
             }
 
-            bool is_add_offset_to_stack_pointer(const u16 opcode) {
+            bool is_add_offset_to_stack_pointer(const u16 opcode) noexcept {
                 constexpr u16 format = 0xb000;
                 constexpr u16 mask = 0xff00;
                 return (opcode & mask) == format;
             }
 
-            bool is_push_pop_registers(const u16 opcode) {
+            bool is_push_pop_registers(const u16 opcode) noexcept {
                 constexpr u16 format = 0xb400;
                 constexpr u16 mask = 0xf600;
                 return (opcode & mask) == format;
             }
 
-            bool is_load_store_halfword(const u16 opcode) {
+            bool is_load_store_halfword(const u16 opcode) noexcept {
                 constexpr u16 format = 0x8000;
                 constexpr u16 mask = 0xf000;
                 return (opcode & mask) == format;
             }
 
-            bool is_sp_relative_load_store(const u16 opcode) {
+            bool is_sp_relative_load_store(const u16 opcode) noexcept {
                 constexpr u16 format = 0x9000;
                 constexpr u16 mask = 0xf000;
                 return (opcode & mask) == format;
             }
 
-            bool is_load_address(const u16 opcode) {
+            bool is_load_address(const u16 opcode) noexcept {
                 constexpr u16 format = 0xa000;
                 constexpr u16 mask = 0xf000;
                 return (opcode & mask) == format;
             }
 
-            bool is_load_store_with_immediate_offset(const u16 opcode) {
+            bool is_load_store_with_immediate_offset(const u16 opcode) noexcept {
                 constexpr u16 format = 0x6000;
                 constexpr u16 mask = 0xe000;
                 return (opcode & mask) == format;
             }
 
-            bool is_load_store_with_register_offset(const u16 opcode) {
+            bool is_load_store_with_register_offset(const u16 opcode) noexcept {
                 constexpr u16 format = 0x5000;
                 constexpr u16 mask = 0xf200;
                 return (opcode & mask) == format;
             }
 
-            bool is_load_store_sign_extended_byte_halfword(const u16 opcode) {
+            bool is_load_store_sign_extended_byte_halfword(const u16 opcode) noexcept {
                 constexpr u16 format = 0x5200;
                 constexpr u16 mask = 0xf200;
                 return (opcode & mask) == format;
             }
 
-            bool is_pc_relative_load(const u16 opcode) {
+            bool is_pc_relative_load(const u16 opcode) noexcept {
                 constexpr u16 format = 0x4800;
                 constexpr u16 mask = 0xf800;
                 return (opcode & mask) == format;
             }
 
-            bool is_hi_register_operations_branch_exchange(const u16 opcode) {
+            bool is_hi_register_operations_branch_exchange(const u16 opcode) noexcept {
                 constexpr u16 format = 0x4400;
                 constexpr u16 mask = 0xfc00;
                 return (opcode & mask) == format;
             }
 
-            bool is_alu_operations(const u16 opcode) {
+            bool is_alu_operations(const u16 opcode) noexcept {
                 constexpr u16 format = 0x4000;
                 constexpr u16 mask = 0xfc00;
                 return (opcode & mask) == format;
             }
 
-            bool is_move_compare_add_subtract_immediate(const u16 opcode) {
+            bool is_move_compare_add_subtract_immediate(const u16 opcode) noexcept {
                 constexpr u16 format = 0x2000;
                 constexpr u16 mask = 0xe000;
                 return (opcode & mask) == format;
             }
 
-            bool is_add_subtract(const u16 opcode) {
+            bool is_add_subtract(const u16 opcode) noexcept {
                 constexpr u16 format = 0x1800;
                 constexpr u16 mask = 0xf800;
                 return (opcode & mask) == format;
             }
 
-            bool is_move_shifted_register(const u16 opcode) {
+            bool is_move_shifted_register(const u16 opcode) noexcept {
                 constexpr u16 format = 0x0000;
                 constexpr u16 mask = 0xe000;
                 return (opcode & mask) == format;
@@ -256,7 +256,7 @@ namespace arm7tdmi {
             
         }
 
-        instruction decode(const u16 opcode) {
+        instruction decode(const u16 opcode) noexcept {
             if (is_software_interrupt(opcode)) return instruction::software_interrupt;
             if (is_unconditional_branch(opcode)) return instruction::unconditional_branch;
             if (is_conditional_branch(opcode)) return instruction::conditional_branch;
@@ -279,7 +279,7 @@ namespace arm7tdmi {
             return instruction::unknown;
         }
 
-        const char * instruction_to_string(const instruction instr) {
+        const char * instruction_to_string(const instruction instr) noexcept {
             switch(instr) {
                 case instruction::software_interrupt: return "software_interrupt";
                 case instruction::unconditional_branch: return "unconditional_branch";

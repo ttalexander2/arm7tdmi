@@ -8,7 +8,7 @@
 
 namespace arm7tdmi {
 
-    size_t cpu_registers::register_enum_to_index(const Register reg) const {
+    size_t cpu_registers::register_enum_to_index(const Register reg) const noexcept {
         const auto mode = cpsr_get_mode();
 
         switch (reg) {
@@ -71,7 +71,7 @@ namespace arm7tdmi {
         }
     }
 
-    Register cpu_registers::register_index_to_enum(const size_t index) {
+    Register cpu_registers::register_index_to_enum(const size_t index) noexcept {
         switch (index) {
             case REG_R0: return Register::R0;
             case REG_R1: return Register::R1;
@@ -107,87 +107,88 @@ namespace arm7tdmi {
             case REG_SPSR_UNDEF: return Register::SPSR;
             default:
                 assert(false);
+                // ReSharper disable once CppDFAUnreachableCode
                 return Register::R0;
         }
     }
 
-    bool cpu_registers::cpsr_get_n() const {
+    bool cpu_registers::cpsr_get_n() const noexcept {
         return util::bit_check(get(Register::CPSR), CPSR_N);
     }
 
-    void cpu_registers::cpsr_set_n(const bool value) {
+    void cpu_registers::cpsr_set_n(const bool value) noexcept {
         set(Register::CPSR, util::bit_set_to(get(Register::CPSR), CPSR_N, value));
     }
 
-    bool cpu_registers::cpsr_get_z() const {
+    bool cpu_registers::cpsr_get_z() const noexcept {
         return util::bit_check(get(Register::CPSR), CPSR_Z);
     }
 
-    void cpu_registers::cpsr_set_z(const bool value) {
+    void cpu_registers::cpsr_set_z(const bool value) noexcept {
         set(Register::CPSR, util::bit_set_to(get(Register::CPSR), CPSR_Z, value));
     }
 
-    bool cpu_registers::cpsr_get_c() const {
+    bool cpu_registers::cpsr_get_c() const noexcept {
         return util::bit_check(get(Register::CPSR), CPSR_C);
     }
 
-    void cpu_registers::cpsr_set_c(const bool value) {
+    void cpu_registers::cpsr_set_c(const bool value) noexcept {
         set(Register::CPSR, util::bit_set_to(get(Register::CPSR), CPSR_C, value));
     }
 
-    bool cpu_registers::cpsr_get_v() const {
+    bool cpu_registers::cpsr_get_v() const noexcept {
         return util::bit_check(get(Register::CPSR), CPSR_V);
     }
 
-    void cpu_registers::cpsr_set_v(const bool value) {
+    void cpu_registers::cpsr_set_v(const bool value) noexcept {
         set(Register::CPSR, util::bit_set_to(get(Register::CPSR), CPSR_V, value));
     }
 
-    bool cpu_registers::cpsr_get_q() const {
+    bool cpu_registers::cpsr_get_q() const noexcept {
         return util::bit_check(get(Register::CPSR), CPSR_Q);
     }
 
-    void cpu_registers::cpsr_set_q(const bool value) {
+    void cpu_registers::cpsr_set_q(const bool value) noexcept {
         set(Register::CPSR, util::bit_set_to(get(Register::CPSR), CPSR_Q, value));
     }
 
-    bool cpu_registers::cpsr_get_i() const {
+    bool cpu_registers::cpsr_get_i() const noexcept {
         return util::bit_check(get(Register::CPSR), CPSR_I);
     }
 
-    void cpu_registers::cpsr_set_i(const bool value) {
+    void cpu_registers::cpsr_set_i(const bool value) noexcept {
         set(Register::CPSR, util::bit_set_to(get(Register::CPSR), CPSR_I, value));
     }
 
-    bool cpu_registers::cpsr_get_f() const {
+    bool cpu_registers::cpsr_get_f() const noexcept {
         return util::bit_check(get(Register::CPSR), CPSR_F);
     }
 
-    void cpu_registers::cpsr_set_f(const bool value) {
+    void cpu_registers::cpsr_set_f(const bool value) noexcept {
         set(Register::CPSR, util::bit_set_to(get(Register::CPSR), CPSR_F, value));
     }
 
-    bool cpu_registers::cpsr_get_t() const {
+    bool cpu_registers::cpsr_get_t() const noexcept {
         return util::bit_check(get(Register::CPSR), CPSR_T);
     }
 
-    void cpu_registers::cpsr_set_t(const bool value) {
+    void cpu_registers::cpsr_set_t(const bool value) noexcept {
         set(Register::CPSR, util::bit_set_to(get(Register::CPSR), CPSR_T, value));
     }
 
-    u32 cpu_registers::cpsr_get_m() const {
+    u32 cpu_registers::cpsr_get_m() const noexcept {
         return data[REG_CPSR] & CPSR_M;
     }
 
-    void cpu_registers::cpsr_set_m(const u32 m) {
+    void cpu_registers::cpsr_set_m(const u32 m) noexcept {
         set(Register::CPSR, (get(Register::CPSR) & ~CPSR_M) | (m & CPSR_M));
     }
 
-    cpu_mode cpu_registers::cpsr_get_mode() const {
+    cpu_mode cpu_registers::cpsr_get_mode() const noexcept {
         return static_cast<cpu_mode>(cpsr_get_m());
     }
 
-    void cpu_registers::cpsr_set_mode(cpu_mode mode) {
+    void cpu_registers::cpsr_set_mode(cpu_mode mode) noexcept {
         cpsr_set_m(static_cast<u32>(mode));
     }
 }

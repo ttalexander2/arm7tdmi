@@ -8,7 +8,6 @@
 
 #include <cstdint>
 #include <climits>
-#include <variant>
 
 namespace arm7tdmi::util
 {
@@ -17,6 +16,7 @@ namespace arm7tdmi::util
         const union {
             uint32_t i;
             char c[4];
+            // ReSharper disable once CppVariableCanBeMadeConstexpr
         } bint = {0x01020304};
 
         return bint.c[0] == 1u;
@@ -41,98 +41,98 @@ namespace arm7tdmi::util
         return dest.u;
     }
 
-    inline constexpr bool bit_check(const u32 number, const u32 n)
+    constexpr bool bit_check(const u32 value, const u32 n) noexcept
     {
-        return (number >> n) & 1u;
+        return (value >> n) & 1u;
     }
 
-    inline constexpr bool bit_check_mask(const u32 number, const u32 mask)
+    constexpr bool bit_check_mask(const u32 value, const u32 mask) noexcept
     {
-        return (number & mask) == mask;
+        return (value & mask) == mask;
     }
 
-    inline constexpr u32 bit_set(const u32 number, const u32 n)
+    constexpr u32 bit_set(const u32 value, const u32 n) noexcept
     {
-        return number | (1u << n);
+        return value | (1u << n);
     }
 
-    inline constexpr u32 bit_set_to(const u32 number, const u32 n, const bool value)
+    constexpr u32 bit_set_to(const u32 number, const u32 n, const bool value) noexcept
     {
         return (number & ~(1u << n)) | (static_cast<u32>(value) << n);
     }
 
-    inline constexpr u32 bit_toggle(const u32 number, const u32 n)
+    constexpr u32 bit_toggle(const u32 value, const u32 n) noexcept
     {
-        return number ^ (1u << n);
+        return value ^ (1u << n);
     }
 
-    inline constexpr u32 bit_clear(const u32 number, const u32 n)
+    constexpr u32 bit_clear(const u32 value, const u32 n) noexcept
     {
-        return number & ~(1u << n);
+        return value & ~(1u << n);
     }
 
-    inline constexpr bool bit_check(const u16 number, const u16 n)
+    constexpr bool bit_check(const u16 value, const u16 n) noexcept
     {
-        return (number >> n) & 1u;
+        return (value >> n) & 1u;
     }
 
-    inline constexpr bool bit_check_mask(const u16 number, const u16 mask)
+    constexpr bool bit_check_mask(const u16 value, const u16 mask) noexcept
     {
-        return (number & mask) == mask;
+        return (value & mask) == mask;
     }
 
-    inline constexpr u16 bit_set(const u16 number, const u16 n)
+    constexpr u16 bit_set(const u16 value, const u16 n) noexcept
     {
-        return number | (1u << n);
+        return value | (1u << n);
     }
 
-    inline constexpr u16 bit_set_to(const u16 number, const u16 n, const bool value)
+    constexpr u16 bit_set_to(const u16 number, const u16 n, const bool value) noexcept
     {
         return (number & ~(1u << n)) | (static_cast<u16>(value) << n);
     }
 
-    inline constexpr u16 bit_toggle(const u16 number, const u16 n)
+    constexpr u16 bit_toggle(const u16 value, const u16 n) noexcept
     {
-        return number ^ (1u << n);
+        return value ^ (1u << n);
     }
 
-    inline constexpr u16 bit_clear(const u16 number, const u16 n)
+    constexpr u16 bit_clear(const u16 value, const u16 n) noexcept
     {
-        return number & ~(1u << n);
+        return value & ~(1u << n);
     }
 
-    inline constexpr bool bit_check(const u8 number, const u8 n)
+    constexpr bool bit_check(const u8 value, const u8 n) noexcept
     {
-        return (number >> n) & 1u;
+        return (value >> n) & 1u;
     }
 
-    inline constexpr bool bit_check_mask(const u8 number, const u8 mask)
+    constexpr bool bit_check_mask(const u8 value, const u8 mask) noexcept
     {
-        return (number & mask) == mask;
+        return (value & mask) == mask;
     }
 
-    inline constexpr u8 bit_set(const u8 number, const u8 n)
+    constexpr u8 bit_set(const u8 value, const u8 n) noexcept
     {
-        return number | (1u << n);
+        return value | (1u << n);
     }
 
-    inline constexpr u8 bit_set_to(const u8 number, const u8 n, const bool value)
+    constexpr u8 bit_set_to(const u8 number, const u8 n, const bool value) noexcept
     {
         return (number & ~(1u << n)) | (static_cast<u8>(value) << n);
     }
 
-    inline constexpr u8 bit_toggle(const u8 number, const u8 n)
+    constexpr u8 bit_toggle(const u8 value, const u8 n) noexcept
     {
-        return number ^ (1u << n);
+        return value ^ (1u << n);
     }
 
-    inline constexpr u8 bit_clear(const u8 number, const u8 n)
+    constexpr u8 bit_clear(const u8 value, const u8 n) noexcept
     {
-        return number & ~(1u << n);
+        return value & ~(1u << n);
     }
 
-    inline i32 twos_compliment(const u32 x, const u32 bits = 31) {
-        const i32 t = static_cast<i32>(x & ((1u << bits) - 1));
+    inline i32 twos_compliment(const u32 value, const u32 bits = 31) noexcept {
+        const i32 t = static_cast<i32>(value & ((1u << bits) - 1));
         return t - (t >> 23 << 24);
     }
 

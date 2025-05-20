@@ -94,107 +94,107 @@ namespace arm7tdmi {
 
         u32 data[37] = {};
 
-        [[nodiscard]] inline u32 get(const Register reg) const { return data[register_enum_to_index(reg)];}
-        [[nodiscard]] inline u32 get(u32 reg) const { return get(static_cast<Register>(reg)); }
+        [[nodiscard]] u32 get(const Register reg) const noexcept { return data[register_enum_to_index(reg)];}
+        [[nodiscard]] u32 get(u32 reg) const noexcept { return get(static_cast<Register>(reg)); }
 
-        inline void set(const Register reg, const u32 val) { data[register_enum_to_index(reg)] = val; }
-        inline void set(u32 reg, const u32 val) { set(static_cast<Register>(reg), val); }
+        void set(const Register reg, const u32 val) noexcept { data[register_enum_to_index(reg)] = val; }
+        void set(u32 reg, const u32 val) noexcept { set(static_cast<Register>(reg), val); }
 
-        [[nodiscard]] bool cpsr_get_n() const;
-        void cpsr_set_n(bool value);
+        [[nodiscard]] bool cpsr_get_n() const noexcept;
+        void cpsr_set_n(bool value) noexcept;
 
-        [[nodiscard]] bool cpsr_get_z() const;
-        void cpsr_set_z(bool value);
+        [[nodiscard]] bool cpsr_get_z() const noexcept;
+        void cpsr_set_z(bool value) noexcept;
 
-        [[nodiscard]] bool cpsr_get_c() const;
-        void cpsr_set_c(bool value);
+        [[nodiscard]] bool cpsr_get_c() const noexcept;
+        void cpsr_set_c(bool value) noexcept;
 
-        [[nodiscard]] bool cpsr_get_v() const;
-        void cpsr_set_v(bool value);
+        [[nodiscard]] bool cpsr_get_v() const noexcept;
+        void cpsr_set_v(bool value) noexcept;
 
-        [[nodiscard]] bool cpsr_get_q() const;
-        void cpsr_set_q(bool value);
+        [[nodiscard]] bool cpsr_get_q() const noexcept;
+        void cpsr_set_q(bool value) noexcept;
 
-        [[nodiscard]] bool cpsr_get_i() const;
-        void cpsr_set_i(bool value);
+        [[nodiscard]] bool cpsr_get_i() const noexcept;
+        void cpsr_set_i(bool value) noexcept;
 
-        [[nodiscard]] bool cpsr_get_f() const;
-        void cpsr_set_f(bool value);
+        [[nodiscard]] bool cpsr_get_f() const noexcept;
+        void cpsr_set_f(bool value) noexcept;
 
-        [[nodiscard]] bool cpsr_get_t() const;
-        void cpsr_set_t(bool value);
+        [[nodiscard]] bool cpsr_get_t() const noexcept;
+        void cpsr_set_t(bool value) noexcept;
 
-        [[nodiscard]] u32 cpsr_get_m() const;
-        void cpsr_set_m(u32 m);
+        [[nodiscard]] u32 cpsr_get_m() const noexcept;
+        void cpsr_set_m(u32 m) noexcept;
 
-        [[nodiscard]] cpu_mode cpsr_get_mode() const;
-        void cpsr_set_mode(cpu_mode mode);
+        [[nodiscard]] cpu_mode cpsr_get_mode() const noexcept;
+        void cpsr_set_mode(cpu_mode mode) noexcept;
 
-        [[nodiscard]] size_t register_enum_to_index(Register reg) const;
-        [[nodiscard]] static Register register_index_to_enum(size_t index);
+        [[nodiscard]] size_t register_enum_to_index(Register reg) const noexcept;
+        [[nodiscard]] static Register register_index_to_enum(size_t index) noexcept;
 
-        [[nodiscard]] inline u32 r0() const { return get(Register::R0); }
-        inline void r0(const u32 val) { set(Register::R0, val); }
+        [[nodiscard]] u32 r0() const noexcept { return get(Register::R0); }
+        void r0(const u32 val) noexcept { set(Register::R0, val); }
 
-        [[nodiscard]] inline u32 r1() const { return get(Register::R1); }
-        inline void r1(const u32 val) { set(Register::R1, val); }
+        [[nodiscard]] u32 r1() const noexcept { return get(Register::R1); }
+        void r1(const u32 val) noexcept { set(Register::R1, val); }
 
-        [[nodiscard]] inline u32 r2() const { return get(Register::R2); }
-        inline void r2(const u32 val) { set(Register::R2, val); }
+        [[nodiscard]] u32 r2() const noexcept { return get(Register::R2); }
+        void r2(const u32 val) noexcept { set(Register::R2, val); }
 
-        [[nodiscard]] inline u32 r3() const { return get(Register::R3); }
-        inline void r3(const u32 val) { set(Register::R3, val); }
+        [[nodiscard]] u32 r3() const noexcept { return get(Register::R3); }
+        void r3(const u32 val) noexcept { set(Register::R3, val); }
 
-        [[nodiscard]] inline u32 r4() const { return get(Register::R4); }
-        inline void r4(const u32 val) { set(Register::R4, val); }
+        [[nodiscard]] u32 r4() const noexcept { return get(Register::R4); }
+        void r4(const u32 val) noexcept { set(Register::R4, val); }
 
-        [[nodiscard]] inline u32 r5() const { return get(Register::R5); }
-        inline void r5(const u32 val) { set(Register::R5, val); }
+        [[nodiscard]] u32 r5() const noexcept { return get(Register::R5); }
+        void r5(const u32 val) noexcept { set(Register::R5, val); }
 
-        [[nodiscard]] inline u32 r6() const { return get(Register::R6); }
-        inline void r6(const u32 val) { set(Register::R6, val); }
+        [[nodiscard]] u32 r6() const noexcept { return get(Register::R6); }
+        void r6(const u32 val) noexcept { set(Register::R6, val); }
 
-        [[nodiscard]] inline u32 r7() const { return get(Register::R7); }
-        inline void r7(const u32 val) { set(Register::R7, val); }
+        [[nodiscard]] u32 r7() const noexcept { return get(Register::R7); }
+        void r7(const u32 val) noexcept { set(Register::R7, val); }
 
-        [[nodiscard]] inline u32 r8() const { return get(Register::R8); }
-        inline void r8(const u32 val) { set(Register::R8, val); }
+        [[nodiscard]] u32 r8() const noexcept { return get(Register::R8); }
+        void r8(const u32 val) noexcept { set(Register::R8, val); }
 
-        [[nodiscard]] inline u32 r9() const { return get(Register::R9); }
-        inline void r9(const u32 val) { set(Register::R9, val); }
+        [[nodiscard]] u32 r9() const noexcept { return get(Register::R9); }
+        void r9(const u32 val) noexcept { set(Register::R9, val); }
 
-        [[nodiscard]] inline u32 r10() const { return get(Register::R10); }
-        inline void r10(const u32 val) { set(Register::R10, val); }
+        [[nodiscard]] u32 r10() const noexcept { return get(Register::R10); }
+        void r10(const u32 val) noexcept { set(Register::R10, val); }
 
-        [[nodiscard]] inline u32 r11() const { return get(Register::R11); }
-        inline void r11(const u32 val) { set(Register::R11, val); }
+        [[nodiscard]] u32 r11() const noexcept { return get(Register::R11); }
+        void r11(const u32 val) noexcept { set(Register::R11, val); }
 
-        [[nodiscard]] inline u32 r12() const { return get(Register::R12); }
-        inline void r12(const u32 val) { set(Register::R12, val); }
+        [[nodiscard]] u32 r12() const noexcept { return get(Register::R12); }
+        void r12(const u32 val) noexcept { set(Register::R12, val); }
 
-        [[nodiscard]] inline u32 r13() const { return get(Register::R13); }
-        inline void r13(const u32 val) { set(Register::R13, val); }
+        [[nodiscard]] u32 r13() const noexcept { return get(Register::R13); }
+        void r13(const u32 val) noexcept { set(Register::R13, val); }
 
-        [[nodiscard]] inline u32 r14() const { return get(Register::R14); }
-        inline void r14(const u32 val) { set(Register::R14, val); }
+        [[nodiscard]] u32 r14() const noexcept { return get(Register::R14); }
+        void r14(const u32 val) noexcept { set(Register::R14, val); }
 
-        [[nodiscard]] inline u32 r15() const { return get(Register::R15); }
-        inline void r15(const u32 val) { set(Register::R15, val); }
+        [[nodiscard]] u32 r15() const noexcept { return get(Register::R15); }
+        void r15(const u32 val) noexcept { set(Register::R15, val); }
 
-        [[nodiscard]] inline u32 sp() const { return r13(); }
-        inline void sp(const u32 val) { r13(val); }
+        [[nodiscard]] u32 sp() const noexcept { return r13(); }
+        void sp(const u32 val) noexcept { r13(val); }
 
-        [[nodiscard]] inline u32 lr() const { return r14(); }
-        inline void lr(const u32 val) { r14(val); }
+        [[nodiscard]] u32 lr() const noexcept { return r14(); }
+        void lr(const u32 val) noexcept { r14(val); }
 
-        [[nodiscard]] inline u32 pc() const { return r15(); }
-        inline void pc(const u32 val) { r15(val); }
+        [[nodiscard]] u32 pc() const noexcept { return r15(); }
+        void pc(const u32 val) noexcept { r15(val); }
 
-        [[nodiscard]] inline u32 cpsr() const { return get(Register::CPSR); }
-        inline void cpsr(const u32 val) { set(Register::CPSR, val); }
+        [[nodiscard]] u32 cpsr() const noexcept { return get(Register::CPSR); }
+        void cpsr(const u32 val) noexcept { set(Register::CPSR, val); }
 
-        [[nodiscard]] inline u32 spsr() const { return get(Register::SPSR); }
-        inline void spsr(const u32 val) { set(Register::SPSR, val); }
+        [[nodiscard]] u32 spsr() const noexcept { return get(Register::SPSR); }
+        void spsr(const u32 val) noexcept { set(Register::SPSR, val); }
     };
 
 }

@@ -7,10 +7,10 @@
 #include <arm7tdmi/memory.h>
 
 namespace arm7tdmi {
-    cpu::cpu(memory_interface *memory) : _memory(memory) {
+    cpu::cpu(memory_interface *memory) noexcept : _memory(memory) {
     }
 
-    void cpu::execute(const arm::instruction instr, const u32 opcode) {
+    void cpu::execute(const arm::instruction instr, const u32 opcode) noexcept {
         switch(instr) {
             case arm::instruction::branch_and_exchange: execute_arm_branch_and_exchange(opcode); break;
             case arm::instruction::block_data_transfer: execute_arm_block_data_transfer(opcode); break;
@@ -30,7 +30,7 @@ namespace arm7tdmi {
             case arm::instruction::unknown: execute_arm_unknown(opcode);
         }
     }
-        void cpu::execute(const thumb::instruction instr, const u16 opcode) {
+        void cpu::execute(const thumb::instruction instr, const u16 opcode) noexcept {
         switch(instr) {
             case thumb::instruction::software_interrupt: execute_thumb_software_interrupt(opcode); break;
             case thumb::instruction::unconditional_branch: execute_thumb_unconditional_branch(opcode); break;
@@ -57,7 +57,7 @@ namespace arm7tdmi {
         }
     }
 
-    void cpu::execute_arm_branch_and_exchange(const u32 instr) {
+    void cpu::execute_arm_branch_and_exchange(const u32 instr) noexcept {
 
         if (!check_condition(instr))
             return;
@@ -81,9 +81,15 @@ namespace arm7tdmi {
         _state = exchange_mode;
     }
 
-    void cpu::execute_arm_block_data_transfer(const u32 instr) {
+    void cpu::execute_arm_block_data_transfer(const u32 instr) noexcept {
         if (!check_condition(instr))
             return;
+
+        const bool load = util::bit_check(instr, 20u);
+        const bool write_back = util::bit_check(instr, 21u);
+        const bool psr = util::bit_check(instr, 22u);
+        const bool up = util::bit_check(instr, 23u);
+        const bool pre_indexing = util::bit_check(instr, 24u);
 
         u8 register_list [16] = {};
         u8 register_list_n = 0;
@@ -98,15 +104,9 @@ namespace arm7tdmi {
                 if (i == 15) r15_in_list = true;
             }
         }
-
         const u8 base_register = (instr >> 16) & 0xf;
-        const bool load = util::bit_check(instr, 20u);
-        const bool write_back = util::bit_check(instr, 21u);
-        const bool psr = util::bit_check(instr, 22u);
-        const bool up = util::bit_check(instr, 23u);
-        const bool pre_indexing = util::bit_check(instr, 24u);
 
-        u32 base_addr = registers.get(base_register);
+        const u32 base_addr = registers.get(base_register);
         u32 write_back_addr = base_addr + ((up ? 1 : -1) * sizeof(u32) * register_list_n);
 
         //const u32 offset = register_list_n * sizeof(u32); // Number of registers * word (size of register)
@@ -114,7 +114,8 @@ namespace arm7tdmi {
 
         const auto mode = registers.cpsr_get_mode();
         // if user bank transfer, we'll temporarily set the mode to user
-        if (!(psr && r15_in_list)) {
+        const bool switch_mode = psr && (!load || !r15_in_list) && mode != cpu_mode::user && mode != cpu_mode::system;
+        if (switch_mode) {
             registers.cpsr_set_mode(cpu_mode::user);
         }
 
@@ -168,7 +169,7 @@ namespace arm7tdmi {
 
     }
 
-    void cpu::execute_arm_branch(const u32 instr) {
+    void cpu::execute_arm_branch(const u32 instr) noexcept {
 
         if (!check_condition(instr))
             return;
@@ -185,43 +186,43 @@ namespace arm7tdmi {
         }
     }
 
-    void cpu::execute_arm_software_interrupt(const u32 instr) {
+    void cpu::execute_arm_software_interrupt(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_undefined(const u32 instr) {
+    void cpu::execute_arm_undefined(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_single_data_transfer(const u32 instr) {
+    void cpu::execute_arm_single_data_transfer(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_single_data_swap(const u32 instr) {
+    void cpu::execute_arm_single_data_swap(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_multiply(const u32 instr) {
+    void cpu::execute_arm_multiply(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_multiply_long(const u32 instr) {
+    void cpu::execute_arm_multiply_long(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_halfword_data_transfer_register(const u32 instr) {
+    void cpu::execute_arm_halfword_data_transfer_register(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_halfword_data_transfer_immediate(const u32 instr) {
+    void cpu::execute_arm_halfword_data_transfer_immediate(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_psr_transfer_mrs(const u32 instr) {
+    void cpu::execute_arm_psr_transfer_mrs(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_psr_transfer_msr(const u32 instr) {
+    void cpu::execute_arm_psr_transfer_msr(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_data_processing(const u32 instr) {
+    void cpu::execute_arm_data_processing(const u32 instr) noexcept {
     }
 
-    void cpu::execute_arm_unknown(const u32 instr) {
+    void cpu::execute_arm_unknown(const u32 instr) noexcept {
     }
 
-    bool cpu::check_condition(const u32 instr) const {
+    bool cpu::check_condition(const u32 instr) const noexcept {
 
         u32 cond = (instr >> 28) & 0xf;
 
@@ -267,64 +268,64 @@ namespace arm7tdmi {
         }
     }
 
-    void cpu::execute_thumb_software_interrupt(u16 instr) {
+    void cpu::execute_thumb_software_interrupt(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_unconditional_branch(u16 instr) {
+    void cpu::execute_thumb_unconditional_branch(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_conditional_branch(u16 instr) {
+    void cpu::execute_thumb_conditional_branch(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_multiple_load_store(u16 instr) {
+    void cpu::execute_thumb_multiple_load_store(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_long_branch_with_link(u16 instr) {
+    void cpu::execute_thumb_long_branch_with_link(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_add_offset_to_stack_pointer(u16 instr) {
+    void cpu::execute_thumb_add_offset_to_stack_pointer(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_push_pop_registers(u16 instr) {
+    void cpu::execute_thumb_push_pop_registers(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_load_store_halfword(u16 instr) {
+    void cpu::execute_thumb_load_store_halfword(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_sp_relative_load_store(u16 instr) {
+    void cpu::execute_thumb_sp_relative_load_store(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_load_address(u16 instr) {
+    void cpu::execute_thumb_load_address(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_load_store_with_immediate_offset(u16 instr) {
+    void cpu::execute_thumb_load_store_with_immediate_offset(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_load_store_with_register_offset(u16 instr) {
+    void cpu::execute_thumb_load_store_with_register_offset(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_load_store_sign_extended_byte_halfword(u16 instr) {
+    void cpu::execute_thumb_load_store_sign_extended_byte_halfword(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_pc_relative_load(u16 instr) {
+    void cpu::execute_thumb_pc_relative_load(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_hi_register_operations_branch_exchange(u16 instr) {
+    void cpu::execute_thumb_hi_register_operations_branch_exchange(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_alu_operations(u16 instr) {
+    void cpu::execute_thumb_alu_operations(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_move_compare_add_subtract_immediate(u16 instr) {
+    void cpu::execute_thumb_move_compare_add_subtract_immediate(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_add_subtract(u16 instr) {
+    void cpu::execute_thumb_add_subtract(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_move_shifted_register(u16 instr) {
+    void cpu::execute_thumb_move_shifted_register(u16 instr) noexcept {
     }
 
-    void cpu::execute_thumb_unknown(u16 instr) {
+    void cpu::execute_thumb_unknown(u16 instr) noexcept {
     }
 
 

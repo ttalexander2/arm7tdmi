@@ -28,9 +28,9 @@ namespace arm7tdmi {
             unknown
         };
 
-        const char* instruction_to_string(instruction instr);
+        const char* instruction_to_string(instruction instr) noexcept;
 
-        instruction decode(u32 opcode);
+        instruction decode(u32 opcode) noexcept;
 
     }
 
@@ -59,9 +59,9 @@ namespace arm7tdmi {
             unknown
         };
 
-        const char* instruction_to_string(instruction instr);
+        const char* instruction_to_string(instruction instr) noexcept;
 
-        instruction decode(u16 opcode);
+        instruction decode(u16 opcode) noexcept;
 
 
     }

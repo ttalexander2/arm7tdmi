@@ -41,20 +41,20 @@ namespace arm7tdmi {
     public:
         result() = delete;
         // ReSharper disable once CppNonExplicitConvertingConstructor
-        result(T returnValue) : _data(returnValue), _valid(true) {} // NOLINT(*-explicit-constructor)
+        result(T returnValue) noexcept : _data(returnValue), _valid(true) {} // NOLINT(*-explicit-constructor)
         // ReSharper disable once CppNonExplicitConvertingConstructor
-        result(E errorValue) : _error(errorValue), _valid(false) {} // NOLINT(*-explicit-constructor)
+        result(E errorValue) noexcept : _error(errorValue), _valid(false) {} // NOLINT(*-explicit-constructor)
 
-        [[nodiscard]] bool valid() const { return _valid; }
+        [[nodiscard]] bool valid() const noexcept { return _valid; }
 
-        [[nodiscard]] T value() const { return std::move(_data); }
-        [[nodiscard]] E error() const { return std::move(_error); }
+        [[nodiscard]] T value() const noexcept { return std::move(_data); }
+        [[nodiscard]] E error() const noexcept { return std::move(_error); }
 
-        T* operator->() const { return &_data; }
+        T* operator->() const noexcept { return &_data; }
     };
 
-    const char * error_to_string(error instr);
+    const char * error_to_string(error instr) noexcept;
 
 }
 
-inline auto format_as(const arm7tdmi::error f) { return arm7tdmi::error_to_string(f); }
+inline auto format_as(const arm7tdmi::error f) noexcept { return arm7tdmi::error_to_string(f); }

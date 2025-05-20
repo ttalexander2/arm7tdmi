@@ -5,19 +5,19 @@
 #include <arm7tdmi/cpu.h>
 
 namespace arm7tdmi {
-    basic_memory::basic_memory(const u64 size) : _size(size) {
+    basic_memory::basic_memory(const u64 size) noexcept : _size(size) {
         _memory = new u8[size];
     }
 
-    basic_memory::~basic_memory() {
+    basic_memory::~basic_memory() noexcept {
         delete[] _memory;
     }
 
-    u64 basic_memory::size() const {
+    u64 basic_memory::size() const noexcept {
         return _size;
     }
 
-    bool basic_memory::read_byte(const u32 address, u8* out) const {
+    bool basic_memory::read_byte(const u32 address, u8* out) const noexcept {
         if (address >= _size) {
             return false;
         }
@@ -25,7 +25,7 @@ namespace arm7tdmi {
         return true;
     }
 
-    bool basic_memory::write_byte(const size_t address, const u8 value) {
+    bool basic_memory::write_byte(const size_t address, const u8 value) noexcept {
         if (address >= _size) {
             return false;
         }

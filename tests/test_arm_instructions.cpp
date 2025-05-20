@@ -180,7 +180,7 @@ TEST_CASE("arm_instruction_block_data_transfer", "[arm instructions]")
     // LDMFD SP!,{R15}             @ R15 <- (SP),CPSR unchanged.
     {
         cpu.registers.pc(0x8000);
-        const u32 b = data[(cpu.registers.pc() + (sizeof(u32) * 2)) / sizeof(u32)];
+        const u32 b = data[(cpu.registers.pc() + sizeof(u32) * 2) / sizeof(u32)];
         auto instr = arm7tdmi::arm::decode(b);
 
         cpu.registers.sp(0x0000);
@@ -257,7 +257,7 @@ TEST_CASE("arm_instruction_block_data_transfer", "[arm instructions]")
             REQUIRE(val == user_registers[i]);
         }
 
-        u32 val;
+        u32 val{};
         memory.read<u32>(cpu.registers.sp(), &val);
         REQUIRE(val == old_sp);
     }
